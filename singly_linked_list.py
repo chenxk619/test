@@ -171,3 +171,7 @@ class Linked_list:
 			self.head = sec_node
 
 #Driver code will be below
+llist = Linked_list()
+llist.push_back(1)
+llist.push_front(0)
+print(llist)
