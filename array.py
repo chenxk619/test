@@ -31,27 +31,54 @@ class Array(object):
 
 	def append(self, item):
 		if self.item_count >= self.array_capacity:
-			self.enlarge_capacity(self.array_capacity * 2)
+			self._enlarge_capacity(self.array_capacity * 2)
 		self.primary_array[self.item_count] = item
 		self.item_count += 1
 
-	def enlarge_capacity(self, new_capacity):
+	def prepend(self, item):
+		if self.item_count >= self.array_capacity:
+			self._enlarge_capacity(self.array_capacity * 2)
+		secondary_array = self.create_array(self.array_capacity)
+		secondary_array[0] = item
+		for i in range(0, self.item_count):
+			print(i)
+			secondary_array[i + 1] = self.primary_array[i]
+		self.primary_array = secondary_array
+		self.item_count += 1
+
+	def _enlarge_capacity(self, new_capacity):
 		secondary_array = self.create_array(new_capacity)
 		for i in range(self.item_count):
 			secondary_array[i] = self.primary_array[i]
-		self.array_capacity *= 2
+		self.array_capacity = new_capacity
 		self.primary_array = secondary_array
 
 	def insert(self, index, item):
 		if self.item_count == self.array_capacity:
-			self.enlarge_capacity(self.array_capacity * 2)
-		for i in range(index, self.item_count):
-			self.primary_array[i + 1] = self.primary_array[i]
-		self.append(self.primary_array[self.item_count])
-		self.primary_array[index] = item
+			self._enlarge_capacity(self.array_capacity * 2)
+		secondary_array = self.create_array(self.array_capacity)
+		for i in range(0, index):
+			secondary_array[i] = self.primary_array[i]
+		secondary_array[index] = item
+		for i in range(index + 1 , self.item_count + 1):
+			secondary_array[i] = self.primary_array[i - 1]
+		self.primary_array = secondary_array
+		self.item_count += 1
+
+	def delete(self, index):
+		secondary_array = self.create_array(self.array_capacity)
+		for i in range(0, index):
+			secondary_array[i] = self.primary_array[i]
+		for i in range(index + 1, self.item_count):
+			print(i)
+			secondary_array[i - 1] = self.primary_array[i]
+		self.item_count -= 1
+		self.primary_array = secondary_array
+		if self.item_count == self.array_capacity:
+			self._enlarge_capacity(self.array_capacity * 1/2)
 
 
-	def list(self):
+	def __repr__(self):
 		output = ''
 		for i in range(self.item_count):
 			output = output + str(self.primary_array[i]) + ','
@@ -61,8 +88,9 @@ class Array(object):
 
 
 array = Array()
-array.append(1)
+array.append(2)
 array.append(4)
-array.append(3)
-array.insert(2,3)
-print(array.list())
+array.append(5)
+array.insert(0,3) #[3,2,4,5]
+array.prepend(2)
+print(array)
