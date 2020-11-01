@@ -41,7 +41,6 @@ class Array(object):
 		secondary_array = self.create_array(self.array_capacity)
 		secondary_array[0] = item
 		for i in range(0, self.item_count):
-			print(i)
 			secondary_array[i + 1] = self.primary_array[i]
 		self.primary_array = secondary_array
 		self.item_count += 1
@@ -70,12 +69,17 @@ class Array(object):
 		for i in range(0, index):
 			secondary_array[i] = self.primary_array[i]
 		for i in range(index + 1, self.item_count):
-			print(i)
 			secondary_array[i - 1] = self.primary_array[i]
 		self.item_count -= 1
 		self.primary_array = secondary_array
 		if self.item_count == self.array_capacity:
 			self._enlarge_capacity(self.array_capacity * 1/2)
+
+	def find(self, item):
+		for i in range(self.item_count):
+			if self.primary_array[i] == item:
+				return i
+		return -1
 
 
 	def __repr__(self):
@@ -93,4 +97,5 @@ array.append(4)
 array.append(5)
 array.insert(0,3) #[3,2,4,5]
 array.prepend(2)
+print(array.find(7))
 print(array)
