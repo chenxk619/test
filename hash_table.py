@@ -58,12 +58,11 @@ class Hash_table:
 		if node is None:
 			self.buckets[hash_value] = Node(key, value)
 			return
-		# Collision here so link the new Node to the linked list present
+		# If collision happens: link the new node to the linked list present, by going through the linked list.
 		prev = node
 		while node is not None:
 			prev = node
 			node = node.next
-		# when node is None
 		prev.next = Node(key, value)
 
 	#prints the hash_table
@@ -77,7 +76,7 @@ class Hash_table:
 				output += ' {} : {},'.format(i.key, node.val)
 		return '{' + output[:-1] + '}'
 
-	#
+	#Get the hash_value, then go through the linked list until the key's node.val is found, otherwise return None
 	def find(self, key):
 		hash_value = self.hashing(key)
 		node = self.buckets[hash_value]
@@ -89,11 +88,12 @@ class Hash_table:
 			return node.val
 		return None
 
-
+#Driver Code
 dic = Hash_table()
 dic.insert(1, 2)
 print(dic.hashing('a'))
 dic.insert(290, 'penis')
+dic.insert(290, 'balls')
 print(dic.find(1))
 dic[1] = 4
-print(dic[1])
+print(dic)
