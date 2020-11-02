@@ -29,12 +29,16 @@ class Array(object):
 		except:
 			print('Index Error : Index out of bounds')
 
+	#Add an item of item_count at the end of the array
+	# ,expand array if necessary
 	def append(self, item):
 		if self.item_count >= self.array_capacity:
 			self._enlarge_capacity(self.array_capacity * 2)
 		self.primary_array[self.item_count] = item
 		self.item_count += 1
 
+	#Add the item to index 0 of secondary array, then copy
+	#the array over, expand the array cap if needed
 	def prepend(self, item):
 		if self.item_count >= self.array_capacity:
 			self._enlarge_capacity(self.array_capacity * 2)
@@ -45,6 +49,8 @@ class Array(object):
 		self.primary_array = secondary_array
 		self.item_count += 1
 
+	#Private module here to indicate to others that this should not be explictly called.
+	#this creates a new array of double or half the capacity and passes the elements there
 	def _enlarge_capacity(self, new_capacity):
 		secondary_array = self.create_array(new_capacity)
 		for i in range(self.item_count):
@@ -52,6 +58,8 @@ class Array(object):
 		self.array_capacity = new_capacity
 		self.primary_array = secondary_array
 
+	#Passes the elements prior to the index to a new array, then append the item of specified index to the same array,
+	# then pass in the rest of the elements.
 	def insert(self, index, item):
 		if self.item_count == self.array_capacity:
 			self._enlarge_capacity(self.array_capacity * 2)
@@ -62,14 +70,17 @@ class Array(object):
 		for i in range(index + 1 , self.item_count + 1):
 			secondary_array[i] = self.primary_array[i - 1]
 		self.primary_array = secondary_array
+		#Don't forget about item_count + 1, otherwise it won't show the last element
 		self.item_count += 1
 
+	#Similar to insert, but this time don't append the item of specified index.
 	def delete(self, index):
 		secondary_array = self.create_array(self.array_capacity)
 		for i in range(0, index):
 			secondary_array[i] = self.primary_array[i]
 		for i in range(index + 1, self.item_count):
 			secondary_array[i - 1] = self.primary_array[i]
+		#Also item_count - 1 for this module
 		self.item_count -= 1
 		self.primary_array = secondary_array
 		if self.item_count == self.array_capacity:
@@ -81,16 +92,14 @@ class Array(object):
 				return i
 		return -1
 
-
+	#prints the array
 	def __repr__(self):
 		output = ''
 		for i in range(self.item_count):
 			output = output + str(self.primary_array[i]) + ','
 		return '[' + output[:-1] + ']'
 
-
-
-
+#Driver code
 array = Array()
 array.append(2)
 array.append(4)
