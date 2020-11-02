@@ -31,6 +31,24 @@ class Hash_table:
 		hash_value %= self.capacity
 		return hash_value
 
+	#Allows indexing of the dictionaries
+	def __getitem__(self, index):
+		return self.buckets[index].val
+
+	#Allows the keys of the dictionaries to be changed by referencing them
+	def __setitem__(self, index, value):
+		node = self.buckets[index]
+		self.item_count += 1
+		if node is None:
+			#Note that node = Node(index,value) does NOT work as node is a local variable and does not get changed like
+			#the class attribute buckets
+			self.buckets[index] = Node(index, value)
+		else:
+			while node.next is not None:
+				print('hi')
+				node = node.next
+			self.buckets[index] = Node(index, value)
+
 	def insert(self, key, value):
 		self.item_count += 1
 		# Get hash value
@@ -48,6 +66,7 @@ class Hash_table:
 		# when node is None
 		prev.next = Node(key, value)
 
+	#prints the hash_table
 	def __repr__(self):
 		output = ''
 		for i in self.buckets:
@@ -58,6 +77,7 @@ class Hash_table:
 				output += ' {} : {},'.format(i.key, node.val)
 		return '{' + output[:-1] + '}'
 
+	#
 	def find(self, key):
 		hash_value = self.hashing(key)
 		node = self.buckets[hash_value]
@@ -72,10 +92,8 @@ class Hash_table:
 
 dic = Hash_table()
 dic.insert(1, 2)
-dic.insert(1, 3)
-dic.insert(1, 4)
-dic.insert(1, 5)
 print(dic.hashing('a'))
 dic.insert(290, 'penis')
 print(dic.find(1))
-print(dic)
+dic[1] = 4
+print(dic[1])
