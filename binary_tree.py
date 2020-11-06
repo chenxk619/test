@@ -20,8 +20,7 @@ class Binary_tree:
 				self.base = node
 				root = node
 				return
-			# If node value is larger/smaller than the root value, check if it exists or not,
-			# if it does set it as root.left/right then new root, otherwise recursion on that as new root
+			# If node value is larger/smaller than the root value, check if it exists or not, if it does set it as root.left/right then new root, otherwise recursion on that as new root
 			elif node.val > root.val:
 				if root.right is None:
 					root.right = node
@@ -36,6 +35,29 @@ class Binary_tree:
 					recursion(self, node, root.left)
 
 		recursion(self, node, self.base)
+
+	# Records the height of the b_tree
+	def height(self):
+		if self.base is None:
+			return 0
+		count, record = 1, 0
+		root = self.base
+
+		# Similar to show(), but it gets the record of the max depth of the tree instead
+		def recursion(self, root, count, record):
+			if root.left is not None:
+				record = max(record, count)
+				root, count, record = recursion(self, root.left, count + 1, record)
+
+			if root.right is not None:
+				record = max(record, count)
+				root, count, record = recursion(self, root.right, count + 1, record)
+			else:
+				record = max(record, count)
+				return root, count, record
+
+		root, count, record = recursion(self, root, count, record)
+		return record
 
 	# To check if a node exist
 	def find(self, value):
@@ -85,12 +107,9 @@ class Binary_tree:
 		lst.append(node)
 		return self._get_min(node.left, lst)
 
-	# This is basically a modified get_min and get_max, it will return the next highest node after the specified node,
-	# return -1 if None. It is supposed to get the smallest value on the right subtree,
-	# otherwise get the first element on left subtree. This is known as the successor node(s_node)
+	# This is basically a modified get_min and get_max, it will return the next highest node after the specified node, return -1 if None. It is supposed to get the smallest value on the right subtree, otherwise get the first element on left subtree. This is known as the successor node(s_node)
 
-	# IMPORTANT TO NOTE IF A (successor) NODE IS REMOVED, IT WILL EITHER HAVE NO CHILD NODES OR ONLY RIGHT CHILD NODES,
-	# otherwise it move further left
+	# IMPORTANT TO NOTE IF A (successor) NODE IS REMOVED, IT WILL EITHER HAVE NO CHILD NODES OR ONLY RIGHT CHILD NODES, otherwise it move further left
 	def get_successor(self, node):
 
 		# If removed node has no subtrees
@@ -114,15 +133,24 @@ class Binary_tree:
 			else:
 				return node_val, s_node, parent_node
 
-	"""To delete a node is the most complicated code to handle so far, as the tree after the deleted node
-	has to meet the condition of left subtree having smaller nodes and the right subtree having bigger nodes.
-	I'm following this website to do so: 
+	"""To delete a node is the most complicated code to handle so far,
+	as the tree after the deleted node
+	has to meet the condition of left subtree having smaller nodes and
+	the right subtree having bigger nodes.
+	I'm following this website to do so:
 	http://www.mathcs.emory.edu/~cheung/Courses/171/Syllabus/9-BinTree/BST-delete2.html
-	In the case of a node with 2 subtrees, to remove a node, we need to replace that 
-	node with a node known as the successor node. This is defined as the 
-	node on the RIGHT subtree with the SMALLEST value relative to the deleted node. So we have to find the most left 
-	node in the right subtree(if a left subtree doesn't exist for the right subtree, the top node is the successor 
-	node). This could have been done all in this method, but spliting it up to get_max, get_min and successor 
+	In the case of a node with 2 subtrees, to
+	remove a node, we need to replace that 
+	node with a node known as the 
+	successor node. This is defined as the 
+	node on the RIGHT subtree with the SMALLEST value relative to the deleted 
+	node. So we have to find the most left 
+	node in the right subtree(if a left
+	subtree doesn't exist for the right 
+	subtree, the top node is the successor 
+	node). This could have been done all in 
+	this method, but spliting it up to
+	get_max, get_min and successor 
 	methods above made this easier"""
 
 	def remove(self, value):
@@ -139,8 +167,7 @@ class Binary_tree:
 
 			# For 1/2 subtrees, dont matter which
 			else:
-				# Returns the successor node, its value and the parent node(which will be None
-				# if the successor node has no child, as parent node is not needed)
+				# Returns the successor node, its value and the parent node(which will be None if the successor node has no child, as parent node is not needed)
 				s_node_val, s_node, parent_node = self.get_successor(node)
 				# Replace the removed node val
 				node.val = s_node_val
@@ -156,6 +183,16 @@ class Binary_tree:
 
 		recursion(self, node)
 
+	# Not my code lol ,from this god:
+	# https://leetcode.com/problems/invert-binary-tree/discuss/62714/3-4-lines-Python
+	def invert(self):
+		def recursion(self, root):
+			if root:
+				root.left, root.right = recursion(self, root.right), recursion(self, root.left)
+				return root
+
+		return recursion(self, self.base)
+
 	# This is done in a dfs manner, with the left branch first, then root, then right branch
 	def show(self):
 		def recursion(self, root):
@@ -168,12 +205,12 @@ class Binary_tree:
 
 		recursion(self, self.base)
 
-#Driver Code
+
 b_tree = Binary_tree()
-lst = [10, 5, 7, 3, 4]
+lst = [10, 5, 15, 2, 7, 12, 18]
 for i in lst:
 	b_tree.insert(i)
 b_tree.show()
-
-b_tree.remove(10)
+# print(b_tree.get_max(b_tree.base.right.left))
+b_tree.invert()
 b_tree.show()
