@@ -188,6 +188,8 @@ class Binary_tree:
 	def invert(self):
 		def recursion(self, root):
 			if root:
+				#If root, means it will go to the left and right of the root, and return it to be the opposite of
+				#the current root's direction
 				root.left, root.right = recursion(self, root.right), recursion(self, root.left)
 				return root
 
