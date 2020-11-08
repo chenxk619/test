@@ -13,13 +13,14 @@ class Nodes:
 		#node pos
 		self.node_pos = node_pos
 		#distance from starting node
-		self.G_cost = self.get_g_cost(self.start)
+		self.G_cost = self.get_cost(self.start)
 		#distance from end node
-		#self.F_cost = self.get_f_cost(self.end)
-		#self.H_cost = self.G_cost + self.F_cost
 
-	#distance from start node
-	def get_g_cost(self, pos):
+		self.F_cost = self.get_cost(self.end)
+		self.H_cost = self.G_cost + self.F_cost
+
+	#distance from start node/end node
+	def get_cost(self, pos):
 		#This means that this node and start are diagonal
 		x_distance = abs(self.node_pos[0] - pos[0])
 		y_distance = abs(self.node_pos[1] - pos[1])
@@ -27,9 +28,9 @@ class Nodes:
 			#return diagonal distance
 			return ((10 * x_distance) ** 2 + (10 * y_distance) ** 2) ** 0.5
 		elif x_distance == 0:
-			return 10 * x_distance
-		elif y_distance == 0:
 			return 10 * y_distance
+		elif y_distance == 0:
+			return 10 * x_distance
 		else:
 			#split it into diagnoal distance AND horizonatal/vertical distance
 			# Eg: (5,2) -- (2,2) + (3,0)
@@ -41,5 +42,5 @@ class Nodes:
 
 
 board = Board()
-node = Nodes((0,0), (3,4), (3,2))
-print(node.get_g_cost(node.start))
+node = Nodes((2,3), (3,4), (1,1))
+print(node.G_cost, node.F_cost)
