@@ -1,7 +1,7 @@
+import numpy as np
 class Board:
-	def __init__(self):
-		self.x_length = 10
-		self.y_length = 10
+		x_length = 8
+		y_length = 8
 
 class Nodes:
 
@@ -39,8 +39,35 @@ class Nodes:
 			else:
 				return (((10 * x_distance) ** 2 + (10 * x_distance) ** 2) ** 0.5) + (10 * (y_distance - x_distance))
 
+def start_end():
+	print('Please enter a start and end position in tuples(they cannot be the same)')
+	while True:
+		###make this work
+		try:
+			start = tuple(input('Start: '))
+			end = tuple(input('End: '))
+			if type(start) == tuple and type(end) == tuple and start != end:
+				return start, end
+		except:
+			continue
 
 
-board = Board()
-node = Nodes((2,3), (3,4), (1,1))
-print(node.G_cost, node.F_cost)
+def draw():
+	draw_board = np.zeros((Board.x_length, Board.y_length))
+	draw_board[5][5] = 1
+	print(draw_board)
+
+
+
+def main():
+	start, end = start_end()
+	board = Board()
+	draw()
+
+
+
+
+
+if __name__ == '__main__':
+	board = Board()
+	main()
