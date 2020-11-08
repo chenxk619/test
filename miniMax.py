@@ -1,6 +1,7 @@
 import random, time
 import numpy as np
 import sys
+import math
 
 
 # User choice
@@ -111,27 +112,11 @@ def boardUpdate(choice, Board, ava_list, win, lose, tie):
 def converter(user, choice, Board):
 	if user == 'ai_turn':
 		symbol = 'O'
-	else:
+	elif user == 'user_turn':
 		symbol = 'X'
-	if choice == 1:
-		Board[(0, 0)] = symbol
-	if choice == 2:
-		Board[(0, 1)] = symbol
-	if choice == 3:
-		Board[(0, 2)] = symbol
-	if choice == 4:
-		Board[(1, 0)] = symbol
-	if choice == 5:
-		Board[(1, 1)] = symbol
-	if choice == 6:
-		Board[(1, 2)] = symbol
-	if choice == 7:
-		Board[(2, 0)] = symbol
-	if choice == 8:
-		Board[(2, 1)] = symbol
-	if choice == 9:
-		Board[(2, 2)] = symbol
-
+	if choice is not None:
+		Board[(math.ceil(choice/3) - 1, (choice-1)%3)] = symbol
+	
 
 def gameEnd(Board, win, lose, tie):
 	if np.any(np.all(Board == 'X', axis=0)) or np.any(np.all(Board == 'X', axis=1)) or (
