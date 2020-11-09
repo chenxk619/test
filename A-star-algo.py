@@ -3,6 +3,7 @@ class Board:
 		x_length = 8
 		y_length = 8
 
+
 class Nodes:
 
 	def __init__(self,start, end, node_pos):
@@ -39,6 +40,7 @@ class Nodes:
 			else:
 				return (((10 * x_distance) ** 2 + (10 * x_distance) ** 2) ** 0.5) + (10 * (y_distance - x_distance))
 
+
 def start_end():
 	print('Please enter a start and end position in tuples(they cannot be the same)')
 	while True:
@@ -58,20 +60,25 @@ def draw():
 	draw_board[5][5] = 1
 	print(draw_board)
 
-def find(visited, unvisited):
+
+def find(start, end, visited, unvisited):
 	if len(visited) == 1:
 		for i in range(-1, 2):
 			for j in range(-1, 2):
 				if i != 0 or j != 0:
-					unvisited.append([visited[0][0] + i, visited[0][1] + j])
+					#Instantiate the Nodes surrounding the start node and append them to unvisited list
+					unvisited.append(Nodes(start, end, [visited[0][0] + i, visited[0][1] + j]))
+
 
 def main():
 	#start, end = start_end()
-	start = [1,1]
+	start,end = [1,1], [9,9]
 	visited, unvisited, barricades = [start], [], []
 	draw()
-	find(visited, unvisited)
-	print(unvisited)
+	find(start, end, visited, unvisited)
+	for i in unvisited:
+		print(i.H_cost)
+
 
 
 
