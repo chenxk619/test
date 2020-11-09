@@ -15,8 +15,8 @@ class Nodes:
 		#distance from starting node
 		self.G_cost = self.get_cost(self.start)
 		#distance from end node
-
 		self.F_cost = self.get_cost(self.end)
+		#CHANGE THIS LATER ON, H_COST SHOULD BE THE LOWEST OF ITS NEIGHBOURING NODES, NOT THE START
 		self.H_cost = self.G_cost + self.F_cost
 
 	#distance from start node/end node
@@ -46,8 +46,9 @@ def start_end():
 		try:
 			start = tuple(input('Start: '))
 			end = tuple(input('End: '))
-			if type(start) == tuple and type(end) == tuple and start != end:
-				return start, end
+			if start != end and len(start) == len(end) == 3:
+				#Had to use list comprehension with join to change a string of list to a list lol
+				return [int(i) for i in ''.join(start) if i != ','], [int(j) for j in ''.join(end) if j != ',']
 		except:
 			continue
 
@@ -57,12 +58,20 @@ def draw():
 	draw_board[5][5] = 1
 	print(draw_board)
 
-
+def find(visited, unvisited):
+	if len(visited) == 1:
+		for i in range(-1, 2):
+			for j in range(-1, 2):
+				if i != 0 or j != 0:
+					unvisited.append([visited[0][0] + i, visited[0][1] + j])
 
 def main():
-	start, end = start_end()
-	board = Board()
+	#start, end = start_end()
+	start = [1,1]
+	visited, unvisited, barricades = [start], [], []
 	draw()
+	find(visited, unvisited)
+	print(unvisited)
 
 
 
