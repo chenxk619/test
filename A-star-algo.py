@@ -55,10 +55,16 @@ def start_end():
 		except:
 			continue
 
-
-def draw():
+#Legend(what the board shows) : unknown = 0, start = 1, end = 10, visited = 3, surrounding = 5
+def draw(start, end, visited, unvisited):
 	draw_board = np.zeros((Board.x_length, Board.y_length))
-	draw_board[5][5] = 1
+	for node in visited:
+		if node.node_pos[0] == end.node_pos[0] and node.node_pos[1] == end.node_pos[1]:
+			draw_board[node.node_pos[0]][node.node_pos[1]] = 3
+	for node in unvisited:
+		draw_board[node.node_pos[0]][node.node_pos[1]] = 5
+	draw_board[start.node_pos[0]][start.node_pos[1]] = 1
+	draw_board[end.node_pos[0]][end.node_pos[1]] = 10
 	print(draw_board)
 
 
@@ -88,18 +94,13 @@ def find(start, end, visited, unvisited):
 
 def main():
 	#start, end = start_end()
-	start,end = Nodes([1,1], [9,9], [1,1]), Nodes([1,1], [9,9], [9,9])
+	start,end = Nodes([1,1], [7,7], [1,1]), Nodes([1,1], [7,7], [7,7])
 	visited, unvisited, barricades = set(), set(), set()
-	draw()
+	draw(start, end, visited, unvisited)
 	find(start, end, visited, unvisited)
-	for i in unvisited:
-		print(i.H_cost)
-	print('========')
 	find(start,end, visited, unvisited)
-	for i in unvisited:
-		print(i.H_cost)
-
-
+	print('=============')
+	draw(start, end, visited, unvisited)
 
 
 
