@@ -1,7 +1,8 @@
 import numpy as np
+
 class Board:
-		x_length = 8
-		y_length = 8
+	x_length = 8
+	y_length = 8
 
 
 class Nodes:
@@ -18,7 +19,7 @@ class Nodes:
 		#distance from end node
 		self.F_cost = self.get_cost(self.end)
 		#CHANGE THIS LATER ON, H_COST SHOULD BE THE LOWEST OF ITS NEIGHBOURING NODES, NOT THE START
-		self.H_cost = self.G_cost + self.F_cost
+		self.H_cost = int(self.G_cost + self.F_cost)
 
 	#distance from start node/end node
 	def get_cost(self, pos):
@@ -62,20 +63,39 @@ def draw():
 
 
 def find(start, end, visited, unvisited):
-	if len(visited) == 1:
+	if len(visited) == 0:
+		visited.add(start)
+		for i in range(-1, 2):
+			for j in range(-1, 2):
+				#To not add the same node it is currently at
+				if i != 0 or j != 0:
+					#Instantiate the Nodes surrounding the start node and append them to unvisited list
+	 				unvisited.add(Nodes(start.node_pos, end.node_pos, [start.node_pos[0] + i, start.node_pos[1] + j]))
+	else:
+		#find the smallest H_cost node in unvisited list, then set it to visited and find the unvisited nodes around it
+		cur_node_val, cur_node = 0, None
+		for i in unvisited:
+			if cur_node_val < i.H_cost:
+				cur_node_val, cur_node =  i.H_cost, i
+		unvisited.remove(cur_node)
+		visited.add(cur_node)
 		for i in range(-1, 2):
 			for j in range(-1, 2):
 				if i != 0 or j != 0:
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
-					unvisited.append(Nodes(start, end, [visited[0][0] + i, visited[0][1] + j]))
+					unvisited.add(Nodes(start.node_pos, end.node_pos, [cur_node.node_pos[0] + i, cur_node.node_pos[1] + j]))
 
 
 def main():
 	#start, end = start_end()
-	start,end = [1,1], [9,9]
-	visited, unvisited, barricades = [start], [], []
+	start,end = Nodes([1,1], [9,9], [1,1]), Nodes([1,1], [9,9], [9,9])
+	visited, unvisited, barricades = set(), set(), set()
 	draw()
 	find(start, end, visited, unvisited)
+	for i in unvisited:
+		print(i.H_cost)
+	print('========')
+	find(start,end, visited, unvisited)
 	for i in unvisited:
 		print(i.H_cost)
 
