@@ -59,8 +59,7 @@ def start_end():
 def draw(start, end, visited, unvisited):
 	draw_board = np.zeros((Board.x_length, Board.y_length))
 	for node in visited:
-		if node.node_pos[0] == end.node_pos[0] and node.node_pos[1] == end.node_pos[1]:
-			draw_board[node.node_pos[0]][node.node_pos[1]] = 3
+		draw_board[node.node_pos[0]][node.node_pos[1]] = 3
 	for node in unvisited:
 		draw_board[node.node_pos[0]][node.node_pos[1]] = 5
 	draw_board[start.node_pos[0]][start.node_pos[1]] = 1
@@ -69,6 +68,7 @@ def draw(start, end, visited, unvisited):
 
 
 def find(start, end, visited, unvisited):
+	#first time visiting the board
 	if len(visited) == 0:
 		visited.add(start)
 		for i in range(-1, 2):
@@ -80,6 +80,7 @@ def find(start, end, visited, unvisited):
 	else:
 		#find the smallest H_cost node in unvisited list, then set it to visited and find the unvisited nodes around it
 		cur_node_val, cur_node = 0, None
+		#Get the smallest node in unvisited, then remove it from unvisited and add it to visited
 		for i in unvisited:
 			if cur_node_val < i.H_cost:
 				cur_node_val, cur_node =  i.H_cost, i
@@ -87,7 +88,8 @@ def find(start, end, visited, unvisited):
 		visited.add(cur_node)
 		for i in range(-1, 2):
 			for j in range(-1, 2):
-				if i != 0 or j != 0:
+				if (i != 0 or j != 0) and cur_node.node_pos[0] + i >= 0 and cur_node.node_pos[1] + j >= 0:
+					print(cur_node.node_pos[0] + i, cur_node.node_pos[1] + j)
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
 					unvisited.add(Nodes(start.node_pos, end.node_pos, [cur_node.node_pos[0] + i, cur_node.node_pos[1] + j]))
 
