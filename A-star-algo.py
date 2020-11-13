@@ -58,10 +58,10 @@ def start_end():
 #Legend(what the board shows) : unknown = 0, start = 1, end = 10, visited = 3, surrounding = 5
 def draw(start, end, visited, unvisited):
 	draw_board = np.zeros((Board.x_length, Board.y_length))
-	for node in visited:
-		draw_board[node.node_pos[0]][node.node_pos[1]] = 3
 	for node in unvisited:
 		draw_board[node.node_pos[0]][node.node_pos[1]] = 5
+	for node in visited:
+		draw_board[node.node_pos[0]][node.node_pos[1]] = 3
 	draw_board[start.node_pos[0]][start.node_pos[1]] = 1
 	draw_board[end.node_pos[0]][end.node_pos[1]] = 10
 	print(draw_board)
@@ -79,17 +79,17 @@ def find(start, end, visited, unvisited):
 	 				unvisited.add(Nodes(start.node_pos, end.node_pos, [start.node_pos[0] + i, start.node_pos[1] + j]))
 	else:
 		#find the smallest H_cost node in unvisited list, then set it to visited and find the unvisited nodes around it
-		cur_node_val, cur_node = 0, None
+		cur_node_val, cur_node = 10000, None
 		#Get the smallest node in unvisited, then remove it from unvisited and add it to visited
 		for i in unvisited:
-			if cur_node_val < i.H_cost:
+			if cur_node_val > i.H_cost and i.node_pos not in [k.node_pos for k in visited]:
 				cur_node_val, cur_node =  i.H_cost, i
+		print(cur_node.node_pos)
 		unvisited.remove(cur_node)
 		visited.add(cur_node)
 		for i in range(-1, 2):
 			for j in range(-1, 2):
 				if (i != 0 or j != 0) and cur_node.node_pos[0] + i >= 0 and cur_node.node_pos[1] + j >= 0:
-					print(cur_node.node_pos[0] + i, cur_node.node_pos[1] + j)
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
 					unvisited.add(Nodes(start.node_pos, end.node_pos, [cur_node.node_pos[0] + i, cur_node.node_pos[1] + j]))
 
@@ -98,11 +98,10 @@ def main():
 	#start, end = start_end()
 	start,end = Nodes([1,1], [7,7], [1,1]), Nodes([1,1], [7,7], [7,7])
 	visited, unvisited, barricades = set(), set(), set()
-	draw(start, end, visited, unvisited)
-	find(start, end, visited, unvisited)
-	find(start,end, visited, unvisited)
-	print('=============')
-	draw(start, end, visited, unvisited)
+	for i in range(6):
+		find(start,end, visited, unvisited)
+		print('=============')
+		draw(start, end, visited, unvisited)
 
 
 
