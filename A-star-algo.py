@@ -115,13 +115,13 @@ def find(start, end, visited, unvisited):
 
 					if cur_node.node_pos[0] + i == end.node_pos[0] and cur_node.node_pos[1] + j == end.node_pos[1]:
 						#To get the fastest path, from the end node, find the nearest node to the start node
-						backtrack_node = [end.node_pos]
-						while backtrack_node != [start.node_pos]:
+						backtrack_node_pos = [end.node_pos]
+						while backtrack_node_pos != [start.node_pos]:
 							#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
-							candidates = set(node for node in visited if abs(backtrack_node[0][0] - node.node_pos[0]) < 2
-										  and abs(backtrack_node[0][1] - node.node_pos[1]) < 2)
-							#backtrack node now refers to the position of the cur node
-							backtrack_node = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
+							candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
+										  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
+							#backtrack node set to the node_pos in candidates
+							backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
 							#Remove the set of previous node pos
 							visited -= candidates
 
