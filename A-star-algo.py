@@ -62,7 +62,7 @@ def start_end():
 			continue
 
 #Legend(what the board shows) : unknown = 0, start = 1, end = 10, visited = 3, surrounding = 5
-def draw(start, end, visited, unvisited):
+def draw(start, end, visited, unvisited, node_path):
 	draw_board = np.zeros((Board.x_length, Board.y_length))
 
 	for node in unvisited:
@@ -71,12 +71,16 @@ def draw(start, end, visited, unvisited):
 	for node in visited:
 		draw_board[node.node_pos[0]][node.node_pos[1]] = 3
 
+	for node in node_path:
+		print(node)
+		draw_board[node[0][0]][node[0][1]] = 7
+
 	draw_board[start.node_pos[0]][start.node_pos[1]] = 1
 	draw_board[end.node_pos[0]][end.node_pos[1]] = 10
 	print(draw_board)
 
 
-def find(start, end, visited, unvisited):
+def find(start, end, visited, unvisited, node_path):
 	#first time visiting the board
 	if len(visited) == 0:
 		visited.add(start)
@@ -122,6 +126,8 @@ def find(start, end, visited, unvisited):
 										  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
 							#backtrack node set to the node_pos in candidates
 							backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
+							#Add correct nodes to node_path
+							node_path.append(backtrack_node_pos)
 							#Remove the set of previous node pos
 							visited -= candidates
 
@@ -133,10 +139,10 @@ def find(start, end, visited, unvisited):
 def main():
 	#start, end = start_end()
 	start,end = Nodes([1,1], [6,7], [1,1]), Nodes([1,1], [6,7], [6,7])
-	visited, unvisited, barricades = set(), set(), set()
+	visited, unvisited, barricades, node_path= set(), set(), set(), []
 	for i in range(10):
-		find(start,end, visited, unvisited)
-		draw(start, end, visited, unvisited)
+		find(start,end, visited, unvisited, node_path)
+		draw(start, end, visited, unvisited, node_path)
 		print('=============')
 
 
