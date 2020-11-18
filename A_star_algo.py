@@ -2,8 +2,8 @@ import numpy as np
 
 
 class Board:
-	x_length = 8
-	y_length = 8
+	x_length = 50
+	y_length = 50
 
 
 class Nodes:
@@ -114,8 +114,6 @@ def find(start, end, visited, unvisited, node_path, barricades):
 		for i in unvisited:
 			if cur_node_val > i.H_cost and i.node_pos not in [k.node_pos for k in visited]:
 				cur_node_val, cur_node =  i.H_cost, i
-
-		print(cur_node.node_pos)
 
 		unvisited.remove(cur_node)
 		visited.add(cur_node)
