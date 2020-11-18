@@ -23,7 +23,18 @@ def board_init_state(start_pos, end_pos, barricades):
 	#Update the start_node, end_node, barricades
 	#draw rect argu is (pygame.draw.rect(window, color, (x, y, width, height))
 	#Start = Blue (0,0,255), end = purple(204,0,204), visited = red(255,0,0), unvisited = green(0,255,0), barricades = black(0,0,0), node_path = yellow(255,255,0)
-	
+	if start_pos is not None:
+		#Draw start node
+		pygame.draw.rect(screen, (0,0,255), (start_pos[0] * 10 + 1, start_pos[1] * 10 + 1, 9, 9))
+
+	if end_pos is not None:
+		#Draw end node
+		pygame.draw.rect(screen, (204, 0, 204), (end_pos[0] * 10 + 1, end_pos[1] * 10 + 1, 9, 9))
+
+	if len(barricades) > 0:
+		# Draw barricades
+		for barricade in barricades:
+			pygame.draw.rect(screen, (0, 0, 0), (barricade[0] * 10 + 1, barricade[1] * 10 + 1, 9, 9))
 	pygame.display.update()
 
 
@@ -57,8 +68,8 @@ def game(start_pos, end_pos):
 					barricades.append(pos)
 				print(barricades)
 
-			#Press space to start the game
-			if pygame.key.get_pressed()[pygame.K_SPACE]:
+			#Press space to start the game (if start_pos and end_pos are not None)
+			if pygame.key.get_pressed()[pygame.K_SPACE] and start_pos is not None and end_pos is not None:
 				start_state = True
 
 			# Driver code
