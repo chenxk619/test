@@ -12,13 +12,18 @@ class Board_gui:
 		pass
 
 
-def board_init_state():
+def board_init_state(start_pos, end_pos, barricades):
 	screen.fill((255, 255, 255))
 	for i in range(0, 501, 10):
 		# Draw horizontal lines
 		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, 500))
 		# Draw vertical lines
 		pygame.draw.line(screen, (0, 0, 0), (0, i), (500, i))
+
+	#Update the start_node, end_node, barricades
+	#draw rect argu is (pygame.draw.rect(window, color, (x, y, width, height))
+	#Start = Blue (0,0,255), end = purple(204,0,204), visited = red(255,0,0), unvisited = green(0,255,0), barricades = black(0,0,0), node_path = yellow(255,255,0)
+	
 	pygame.display.update()
 
 
@@ -31,9 +36,6 @@ def game(start_pos, end_pos):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
-
-			if pygame.key.get_pressed()[pygame.K_SPACE]:
-				start_state = True
 
 			#Select start node pos
 			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1]:
@@ -55,6 +57,10 @@ def game(start_pos, end_pos):
 					barricades.append(pos)
 				print(barricades)
 
+			#Press space to start the game
+			if pygame.key.get_pressed()[pygame.K_SPACE]:
+				start_state = True
+
 			# Driver code
 			if start_state:
 				# start, end = start_end()
@@ -64,7 +70,7 @@ def game(start_pos, end_pos):
 					find(start, end, visited, unvisited, node_path, barricades)
 					print('=============')
 
-		board_init_state()
+		board_init_state(start_pos, end_pos, barricades)
 
 
 #When starting the game
