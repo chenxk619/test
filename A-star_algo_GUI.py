@@ -40,28 +40,28 @@ def board_init_state(start_pos, end_pos, barricades):
 
 def game(start_pos, end_pos):
 	barricades = []
-	game_start = False
 	start_state = False
 	#Main game loop
 	while True:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
-
+			#For selecting start, end pos and barricades, they can only be done before game starts
 			#Select start node pos
-			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1]:
+			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1] and start_state == False:
 				mouse_position = pygame.mouse.get_pos()
 				if start_pos is None:
 					start_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 
 			#Select end node pos
-			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_2]:
+			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_2] and start_state == False:
 				mouse_position = pygame.mouse.get_pos()
 				if end_pos is None:
 					end_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 
 			#Only able to select barricades if the 'game' hasnt started and both start and end node pos are selected
-			if pygame.mouse.get_pressed()[0] and start_pos is not None and end_pos is not None and pygame.key.get_pressed()[pygame.K_3]:
+			if pygame.mouse.get_pressed()[0] and start_pos is not None and end_pos is not None and \
+					pygame.key.get_pressed()[pygame.K_3] and start_state == False:
 				mouse_position = pygame.mouse.get_pos()
 				pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 				if pos not in barricades:
