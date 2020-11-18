@@ -27,4 +27,7 @@ while True:
 
 
 	screen.fill((255, 255, 255))
+	for i in range(0, 501, 10):
+		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, 500))
+		pygame.draw.line(screen, (0, 0, 0), (0, i), (500, i))
 	pygame.display.update()
