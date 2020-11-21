@@ -69,44 +69,44 @@ def game(start_pos, end_pos):
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
-			#For selecting start, end pos and barricades, they can only be done before game starts
-			#Select start node pos
-			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1] and start_state == False:
-				mouse_position = pygame.mouse.get_pos()
-				if start_pos is None:
-					start_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+		#For selecting start, end pos and barricades, they can only be done before game starts
+		#Select start node pos
+		if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1] and start_state == False:
+			mouse_position = pygame.mouse.get_pos()
+			if start_pos is None:
+				start_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 
-			#Select end node pos
-			if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_2] and start_state == False:
-				mouse_position = pygame.mouse.get_pos()
-				if end_pos is None:
-					end_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+		#Select end node pos
+		if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_2] and start_state == False:
+			mouse_position = pygame.mouse.get_pos()
+			if end_pos is None:
+				end_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 
-			#Only able to select barricades if the 'game' hasnt started and both start and end node pos are selected
-			if pygame.mouse.get_pressed()[0] and start_pos is not None and end_pos is not None and \
-					pygame.key.get_pressed()[pygame.K_3] and start_state == False:
-				mouse_position = pygame.mouse.get_pos()
-				pos = [mouse_position[0] // 10, mouse_position[1] // 10]
-				if pos not in barricades:
-					barricades.append(pos)
+		#Only able to select barricades if the 'game' hasnt started and both start and end node pos are selected
+		if pygame.mouse.get_pressed()[0] and start_pos is not None and end_pos is not None and \
+				pygame.key.get_pressed()[pygame.K_3] and start_state == False:
+			mouse_position = pygame.mouse.get_pos()
+			pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+			if pos not in barricades:
+				barricades.append(pos)
 
-			#Press space to start the game (if start_pos and end_pos are not None)
-			if pygame.key.get_pressed()[pygame.K_SPACE] and start_pos is not None and end_pos is not None:
-				start_state = True
+		#Press space to start the game (if start_pos and end_pos are not None)
+		if pygame.key.get_pressed()[pygame.K_SPACE] and start_pos is not None and end_pos is not None:
+			start_state = True
 
-			#Press left shift to skip the game (if start_pos and end_pos are not None)
-			if pygame.key.get_pressed()[pygame.K_LSHIFT] and start_pos is not None and end_pos is not None:
-				skip, start_state = True, True
+		#Press left shift to skip the game (if start_pos and end_pos are not None)
+		if pygame.key.get_pressed()[pygame.K_LSHIFT] and start_pos is not None and end_pos is not None:
+			skip, start_state = True, True
 
-			# Driver code
-			if start_state:
-				# start, end = start_end()
-				start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
-				find(start, end, visited, unvisited, node_path, barricades)
-				if len(node_path) > 0:
-					stop = True
-					if skip == True:
-						board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
+		# Driver code
+		if start_state:
+			# start, end = start_end()
+			start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
+			find(start, end, visited, unvisited, node_path, barricades)
+			if len(node_path) > 0:
+				stop = True
+				if skip == True:
+					board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
 
 		if skip == False:
@@ -115,6 +115,7 @@ def game(start_pos, end_pos):
 
 #When starting the game
 pygame.init()
+pygame.display.set_caption('A* pathing algo')
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 game(None, None)
