@@ -23,6 +23,28 @@ def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_pa
 	#Update the start_node, end_node, barricades
 	#draw rect argu is (pygame.draw.rect(window, color, (x, y, width, height))
 	#Start = Blue (0,0,255), end = purple(204,0,204), visited = red(255,0,0), unvisited = green(0,255,0), barricades = black(0,0,0), node_path = yellow(255,255,0)
+
+
+	if len(barricades) > 0:
+		# Draw barricades
+		for nodes in barricades:
+			pygame.draw.rect(screen, (0, 0, 0), (nodes[0] * 10 + 1, nodes[1] * 10 + 1, 9, 9))
+
+	if len(unvisited) > 0 :
+		#Draw visited nodes
+		for nodes in unvisited:
+			pygame.draw.rect(screen, (0, 255, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
+
+	if len(visited) > 0:
+		#Draw visited nodes
+		for nodes in visited:
+			pygame.draw.rect(screen, (255, 0, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
+
+	if len(node_path) >0 :
+		#Draw visited nodes
+		for nodes in node_path:
+			pygame.draw.rect(screen, (255, 255, 0), (nodes[0][0] * 10 + 1, nodes[0][1] * 10 + 1, 9, 9))
+
 	if start_pos is not None:
 		#Draw start node
 		pygame.draw.rect(screen, (0,0,255), (start_pos[0] * 10 + 1, start_pos[1] * 10 + 1, 9, 9))
@@ -31,39 +53,19 @@ def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_pa
 		#Draw end node
 		pygame.draw.rect(screen, (204, 0, 204), (end_pos[0] * 10 + 1, end_pos[1] * 10 + 1, 9, 9))
 
-	if len(barricades) > 0:
-		# Draw barricades
-		for nodes in barricades:
-			pygame.draw.rect(screen, (0, 0, 0), (nodes[0] * 10 + 1, nodes[1] * 10 + 1, 9, 9))
-
-
-	#From here is when the game starts
-
-	if len(visited) > 0:
-		#Draw visited nodes
-		for nodes in visited:
-			pygame.draw.rect(screen, (255, 0, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
-
-	if len(unvisited) > 0 :
-		#Draw visited nodes
-		for nodes in unvisited:
-			pygame.draw.rect(screen, (0, 255, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
-
-	if len(node_path) >0 :
-		#Draw visited nodes
-		for nodes in node_path:
-			print(nodes)
-			pygame.draw.rect(screen, (255, 255, 0), (nodes[0][0] * 10 + 1, nodes[0][1] * 10 + 1, 9, 9))
-
 	pygame.display.update()
 
 def game(start_pos, end_pos):
 	barricades = []
 	start_state = False
 	visited, unvisited, node_path = set(), set(), []
+	stop = False
 
 	#Main game loop, runs when visited is not
-	while len(visited) > 0 or len(node_path) == 0:
+	while True:
+
+		if stop == True:
+			break
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
@@ -87,7 +89,6 @@ def game(start_pos, end_pos):
 				pos = [mouse_position[0] // 10, mouse_position[1] // 10]
 				if pos not in barricades:
 					barricades.append(pos)
-				print(barricades)
 
 			#Press space to start the game (if start_pos and end_pos are not None)
 			if pygame.key.get_pressed()[pygame.K_SPACE] and start_pos is not None and end_pos is not None:
@@ -98,10 +99,13 @@ def game(start_pos, end_pos):
 				# start, end = start_end()
 				start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
 				find(start, end, visited, unvisited, node_path, barricades)
+				if [start.node_pos] == [end.node_pos]:
+					stop = True
+
+
 
 		board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
-	print('done')
 
 #When starting the game
 pygame.init()
