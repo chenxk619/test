@@ -35,30 +35,35 @@ def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_pa
 		# Draw barricades
 		for nodes in barricades:
 			pygame.draw.rect(screen, (0, 0, 0), (nodes[0] * 10 + 1, nodes[1] * 10 + 1, 9, 9))
-	pygame.display.update()
+
 
 	#From here is when the game starts
 
-	if visited is not None:
+	if len(visited) > 0:
 		#Draw visited nodes
 		for nodes in visited:
 			pygame.draw.rect(screen, (255, 0, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
 
-	if unvisited is not None:
+	if len(unvisited) > 0 :
 		#Draw visited nodes
 		for nodes in unvisited:
 			pygame.draw.rect(screen, (0, 255, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
 
-	if node_path is not None:
+	if len(node_path) >0 :
 		#Draw visited nodes
 		for nodes in node_path:
-			pygame.draw.rect(screen, (255, 255, 0), (nodes[0] * 10 + 1, nodes[1] * 10 + 1, 9, 9))
+			print(nodes)
+			pygame.draw.rect(screen, (255, 255, 0), (nodes[0][0] * 10 + 1, nodes[0][1] * 10 + 1, 9, 9))
+
+	pygame.display.update()
 
 def game(start_pos, end_pos):
 	barricades = []
 	start_state = False
-	#Main game loop
-	while True:
+	visited, unvisited, node_path = set(), set(), []
+
+	#Main game loop, runs when visited is not
+	while len(visited) > 0 or len(node_path) == 0:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
@@ -92,14 +97,11 @@ def game(start_pos, end_pos):
 			if start_state:
 				# start, end = start_end()
 				start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
-				visited, unvisited, node_path = set(), set(), []
-				for i in range(30):
-					print(i)
-					find(start, end, visited, unvisited, node_path, barricades)
-					board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
+				find(start, end, visited, unvisited, node_path, barricades)
 
-		board_init_state(start_pos, end_pos, barricades, None, None, None)
+		board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
+	print('done')
 
 #When starting the game
 pygame.init()
