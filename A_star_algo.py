@@ -86,6 +86,7 @@ def draw(start, end, visited, unvisited, node_path, barricades):
 
 
 def find(start, end, visited, unvisited, node_path, barricades):
+	stop = False
 	#first time visiting the board
 	if len(visited) == 0:
 		visited.add(start)
@@ -119,7 +120,11 @@ def find(start, end, visited, unvisited, node_path, barricades):
 		visited.add(cur_node)
 
 		for i in range(-1, 2):
+			if stop == True:
+				break
 			for j in range(-1, 2):
+				if stop == True:
+					break
 
 				if (i != 0 or j != 0) and cur_node.node_pos[0] + i >= 0 and cur_node.node_pos[1] + j >= 0 and \
 						cur_node.node_pos[0] + i < Board.y_length and cur_node.node_pos[1] + j < Board.y_length and \
@@ -129,18 +134,19 @@ def find(start, end, visited, unvisited, node_path, barricades):
 					if cur_node.node_pos[0] + i == end.node_pos[0] and cur_node.node_pos[1] + j == end.node_pos[1]:
 						#To get the fastest path, from the end node, find the nearest node to the start node
 						backtrack_node_pos = [end.node_pos]
-						print('backtrack_node_pos:',backtrack_node_pos)
-						print('visited:', visited)
 						while backtrack_node_pos != [start.node_pos]:
-							#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
-							candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
-										  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
-							#backtrack node set to the node_pos in candidates
-							backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
-							#Add correct nodes to node_path
-							node_path.append(backtrack_node_pos)
-							#Remove the set of previous node pos
-							visited -= candidates
+							try:
+								#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
+								candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
+											  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
+								#backtrack node set to the node_pos in candidates
+								backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
+								#Add correct nodes to node_path
+								node_path.append(backtrack_node_pos)
+								#Remove the set of previous node pos
+								visited -= candidates
+							except IndexError:
+								stop = True
 
 
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
@@ -151,7 +157,7 @@ def main():
 	#start, end = start_end()
 	start,end = Nodes([1,1], [6,7], [1,1], [0,0], 0), Nodes([1,1], [6,7], [6,7], [0,0], 0)
 	visited, unvisited, barricades, node_path= set(), set(), [[0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5]], []
-	for i in range(30):
+	while [end.node_pos] != [start.node_pos]:
 		find(start,end, visited, unvisited, node_path, barricades)
 		draw(start, end, visited, unvisited, node_path, barricades)
 		print('=============')
