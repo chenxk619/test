@@ -9,9 +9,6 @@ class Board_gui:
 		self.x_lines = Board.x_length + 1
 		self.y_lines = Board.y_length + 1
 
-	def draw_barricades(self):
-		pass
-
 
 def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path):
 	screen.fill((255, 255, 255))
@@ -61,11 +58,11 @@ def game(start_pos, end_pos):
 	start_state, stop, skip = False, False, False
 	visited, unvisited, node_path, barricades = set(), set(), [], []
 
-	#Main game loop, runs when visited is not
+	#Main game loop
 	while True:
 
 		if stop == True:
-			break
+			pass
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
@@ -108,7 +105,7 @@ def game(start_pos, end_pos):
 				if skip == True:
 					board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
-
+		#If skipping using shift
 		if skip == False:
 			board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
@@ -120,7 +117,4 @@ size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 game(None, None)
 time.sleep(5)
-
-
-
 
