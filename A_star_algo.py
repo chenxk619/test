@@ -129,6 +129,8 @@ def find(start, end, visited, unvisited, node_path, barricades):
 					if cur_node.node_pos[0] + i == end.node_pos[0] and cur_node.node_pos[1] + j == end.node_pos[1]:
 						#To get the fastest path, from the end node, find the nearest node to the start node
 						backtrack_node_pos = [end.node_pos]
+						print('backtrack_node_pos:',backtrack_node_pos)
+						print('visited:', visited)
 						while backtrack_node_pos != [start.node_pos]:
 							#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
 							candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
