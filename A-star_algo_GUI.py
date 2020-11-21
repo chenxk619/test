@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 from A_star_algo import *
 
 
@@ -56,10 +57,9 @@ def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_pa
 	pygame.display.update()
 
 def game(start_pos, end_pos):
-	barricades = []
-	start_state = False
-	visited, unvisited, node_path = set(), set(), []
-	stop = False
+
+	start_state, stop, skip = False, False, False
+	visited, unvisited, node_path, barricades = set(), set(), [], []
 
 	#Main game loop, runs when visited is not
 	while True:
@@ -94,17 +94,23 @@ def game(start_pos, end_pos):
 			if pygame.key.get_pressed()[pygame.K_SPACE] and start_pos is not None and end_pos is not None:
 				start_state = True
 
+			#Press left shift to skip the game (if start_pos and end_pos are not None)
+			if pygame.key.get_pressed()[pygame.K_LSHIFT] and start_pos is not None and end_pos is not None:
+				skip, start_state = True, True
+
 			# Driver code
 			if start_state:
 				# start, end = start_end()
 				start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
 				find(start, end, visited, unvisited, node_path, barricades)
-				if [start.node_pos] == [end.node_pos]:
+				if len(node_path) > 0:
 					stop = True
+					if skip == True:
+						board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
 
-
-		board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
+		if skip == False:
+			board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
 
 
 #When starting the game
@@ -112,6 +118,7 @@ pygame.init()
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 game(None, None)
+time.sleep(5)
 
 
 
