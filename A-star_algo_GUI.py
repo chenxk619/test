@@ -10,13 +10,13 @@ class Board_gui:
 		self.y_lines = Board.y_length + 1
 
 
-def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path):
+def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path, screen, multiplier):
 	screen.fill((255, 255, 255))
-	for i in range(0, 501, 10):
+	for i in range(0, 50 * multiplier + 1, multiplier):
 		# Draw horizontal lines
-		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, 500))
+		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, 50 * multiplier))
 		# Draw vertical lines
-		pygame.draw.line(screen, (0, 0, 0), (0, i), (500, i))
+		pygame.draw.line(screen, (0, 0, 0), (0, i), (50 * multiplier, i))
 
 	#Update the start_node, end_node, barricades
 	#draw rect argu is (pygame.draw.rect(window, color, (x, y, width, height))
@@ -26,34 +26,34 @@ def board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_pa
 	if len(barricades) > 0:
 		# Draw barricades
 		for nodes in barricades:
-			pygame.draw.rect(screen, (0, 0, 0), (nodes[0] * 10 + 1, nodes[1] * 10 + 1, 9, 9))
+			pygame.draw.rect(screen, (0, 0, 0), (nodes[0] * multiplier + 1, nodes[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	if len(unvisited) > 0 :
 		#Draw visited nodes
 		for nodes in unvisited:
-			pygame.draw.rect(screen, (0, 255, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
+			pygame.draw.rect(screen, (0, 255, 0), (nodes.node_pos[0] * multiplier + 1, nodes.node_pos[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	if len(visited) > 0:
 		#Draw visited nodes
 		for nodes in visited:
-			pygame.draw.rect(screen, (255, 0, 0), (nodes.node_pos[0] * 10 + 1, nodes.node_pos[1] * 10 + 1, 9, 9))
+			pygame.draw.rect(screen, (255, 0, 0), (nodes.node_pos[0] * multiplier + 1, nodes.node_pos[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	if len(node_path) >0 :
 		#Draw visited nodes
 		for nodes in node_path:
-			pygame.draw.rect(screen, (255, 255, 0), (nodes[0][0] * 10 + 1, nodes[0][1] * 10 + 1, 9, 9))
+			pygame.draw.rect(screen, (255, 255, 0), (nodes[0][0] * multiplier + 1, nodes[0][1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	if start_pos is not None:
 		#Draw start node
-		pygame.draw.rect(screen, (0,0,255), (start_pos[0] * 10 + 1, start_pos[1] * 10 + 1, 9, 9))
+		pygame.draw.rect(screen, (0,0,255), (start_pos[0] * multiplier + 1, start_pos[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	if end_pos is not None:
 		#Draw end node
-		pygame.draw.rect(screen, (204, 0, 204), (end_pos[0] * 10 + 1, end_pos[1] * 10 + 1, 9, 9))
+		pygame.draw.rect(screen, (204, 0, 204), (end_pos[0] * multiplier + 1, end_pos[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	pygame.display.update()
 
-def game(start_pos, end_pos):
+def game(start_pos, end_pos, screen, multiplier):
 
 	start_state, stop, skip = False, False, False
 	visited, unvisited, node_path, barricades = set(), set(), [], []
@@ -62,7 +62,7 @@ def game(start_pos, end_pos):
 	while True:
 
 		if stop == True:
-			pass
+			break
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
@@ -71,19 +71,19 @@ def game(start_pos, end_pos):
 		if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_1] and start_state == False:
 			mouse_position = pygame.mouse.get_pos()
 			if start_pos is None:
-				start_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+				start_pos = [mouse_position[0] // multiplier, mouse_position[1] // multiplier]
 
 		#Select end node pos
 		if pygame.mouse.get_pressed()[0] and pygame.key.get_pressed()[pygame.K_2] and start_state == False:
 			mouse_position = pygame.mouse.get_pos()
 			if end_pos is None:
-				end_pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+				end_pos = [mouse_position[0] // multiplier, mouse_position[1] // multiplier]
 
 		#Only able to select barricades if the 'game' hasnt started and both start and end node pos are selected
 		if pygame.mouse.get_pressed()[0] and start_pos is not None and end_pos is not None and \
 				pygame.key.get_pressed()[pygame.K_3] and start_state == False:
 			mouse_position = pygame.mouse.get_pos()
-			pos = [mouse_position[0] // 10, mouse_position[1] // 10]
+			pos = [mouse_position[0] // multiplier, mouse_position[1] // multiplier]
 			if pos not in barricades:
 				barricades.append(pos)
 
@@ -100,21 +100,27 @@ def game(start_pos, end_pos):
 			# start, end = start_end()
 			start, end = Nodes(start_pos, end_pos, start_pos, [0, 0], 0), Nodes(start_pos, end_pos, end_pos, [0, 0], 0)
 			find(start, end, visited, unvisited, node_path, barricades)
+			#End node found and appended to node_path
 			if len(node_path) > 0:
 				stop = True
+				#If skipping using shift
 				if skip == True:
-					board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
+					board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path, screen, multiplier)
 
-		#If skipping using shift
+		#If not skipping using shift
 		if skip == False:
-			board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path)
+			board_init_state(start_pos, end_pos, barricades, visited, unvisited, node_path, screen, multiplier)
 
 
-#When starting the game
-pygame.init()
-pygame.display.set_caption('A* pathing algo')
-size = width, height = 500, 500
-screen = pygame.display.set_mode(size)
-game(None, None)
-time.sleep(5)
 
+def main():
+	#When starting the game
+	multiplier = 15
+	pygame.init()
+	pygame.display.set_caption('A* pathing algo')
+	size = width, height = 50 * multiplier, 50 * multiplier
+	screen = pygame.display.set_mode(size)
+	game(None, None, screen, multiplier)
+	time.sleep(5)
+
+main()
