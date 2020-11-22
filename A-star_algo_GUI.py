@@ -59,10 +59,10 @@ def game(start_pos, end_pos, screen, multiplier):
 	visited, unvisited, node_path, barricades = set(), set(), [], []
 
 	#Main game loop
-	while True:
+	while stop == False:
 
-		if stop == True:
-			break
+		# if stop == True:
+		# 	break
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
