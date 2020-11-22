@@ -61,8 +61,6 @@ def game(start_pos, end_pos, screen, multiplier):
 	#Main game loop
 	while stop == False:
 
-		# if stop == True:
-		# 	break
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
