@@ -5,18 +5,21 @@ import random
 class Sorts:
 	def __init__(self, array):
 		self.array = array
-		self.lastest = None
+		self.latest = None
 		self.time_taken = 0
 
-	def __repr__(self):
-		return 'Sorted array using {} : {} in {}'.format(self.lastest, self.array, self.time_taken)
+	def show(self, *show):
+		if len(show) > 0:
+			print('Sorted array using {} : {} in {} seconds'.format(self.latest, self.array, self.time_taken))
+		else:
+			print('Sorted array using {} in {} seconds'.format(self.latest, self.time_taken))
 
 	# For bubble sort, set conditional of swap to be False under a while True loop, and loop throught the list and swap
 	# positions 2 by 2. If we are at the end of the list and no swaps occur, return list
 
 	def bubble_sort(self):
 		start = time.time()
-		self.lastest = 'bubble_sort'
+		self.latest = 'bubble_sort'
 		while True:
 			sort_done = True
 			for i in range(len(self.array[:-1])):
@@ -33,7 +36,7 @@ class Sorts:
 
 	def insertion_sort(self):
 		start = time.time()
-		self.lastest = 'insertion_sort'
+		self.latest = 'insertion_sort'
 		for i in range(1, len(self.array)):
 			for j in range(i - 1, -1, -1):
 				if self.array[j] > self.array[j + 1]:
@@ -51,7 +54,7 @@ class Sorts:
 
 	def quick_sort(self):
 		start = time.time()
-		self.lastest = 'quick_sort'
+		self.latest = 'quick_sort'
 
 		def sort(left, right):
 
@@ -73,11 +76,52 @@ class Sorts:
 		sort(0, len(self.array) - 1)
 		self.time_taken = time.time() - start
 
+	#The idea behind merge sort is to divide the input array into two halves, calls itself for the two halves,
+	# and then merges the two sorted halves recursively. The merging process is done by 2 iterators, one on each array.
+	# When a element is appending to the output array, its iterator is incremented. At the last element, the other list
+	# is automatically added to output array.
+
+	def merge_sort(self):
+		start = time.time()
+		self.latest = 'merge_sort'
+		def sort(lst):
+			print(lst)
+			i, j = 0, 0
+			output = []
+
+			if len(lst) > 1:
+				mid = len(lst) // 2
+				# print(lst[:mid])
+				arr1 = sort(lst[:mid])
+				arr2 = sort(lst[mid:])
+				# Merge the two lists together to a output list
+				while i < len(arr1) and j < len(arr2):
+					if arr1[i] < arr2[j]:
+						output.append(arr1[i])
+						i += 1
+					else:
+						output.append(arr2[j])
+						j += 1
+
+				# When one of the list is not empty, combine the remaining elements with the output list
+				if i == len(arr1):
+					output += arr2[j:]
+				elif j == len(arr2):
+					output += arr1[i:]
+
+				return output
+
+			else:
+				return lst
+		self.array = sort(self.array)
+		self.time_taken = time.time() - start
+
 
 # Driver code
 lst = []
-for i in range(100):
+for i in range(1000):
 	lst.append(random.randint(1, 100))
 sorted_obj = Sorts(lst)
-sorted_obj.bubble_sort()
-print(sorted_obj)
+sorted_obj.quick_sort()
+#optional input to show the actual array
+sorted_obj.show()
