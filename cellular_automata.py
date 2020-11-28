@@ -33,7 +33,7 @@ def board_update(screen, grid, multiplier):
 	pygame.display.update()
 
 
-def game(screen, grid, cells, multiplier):
+def game(screen, grid, cells, Clock, multiplier):
 	stop, game_start = False, False
 	while stop == False:
 		for event in pygame.event.get():
@@ -53,6 +53,8 @@ def game(screen, grid, cells, multiplier):
 
 		if game_start == True:
 			backend(grid, cells)
+		#To set the pace of the game
+		Clock.tick(10)
 			
 
 def main():
@@ -61,8 +63,9 @@ def main():
 	size = width, height = 750, 750
 	grid = 50
 	cells = []
+	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	game(screen, grid, cells, 15)
+	game(screen, grid, cells, Clock, 15)
 
 main()
 	
