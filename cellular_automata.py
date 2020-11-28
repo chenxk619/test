@@ -21,14 +21,14 @@ def backend(grid, cells, board):
 		for i in range(-1,2):
 			for j in range(-1,2):
 				if i != 0 and j != 0:
-					if cell[cell[0] + i, cell[1] + j] in cells:
+					if [cell[0] + i, cell[1] + j] in cells:
 						neighbours += 1
-					dead_neighbour = cell[cell[0] + i, cell[1] + j]
+					dead_neighbour = [cell[0] + i, cell[1] + j]
 					live_count = 0
 					for x in range(-1,2):
 						for y in range(-1,2):
 							if x != 0 and y != 0:
-								if cell[dead_neighbour[0] + x, dead_neighbour[1] + y] in cells:
+								if [dead_neighbour[0] + x, dead_neighbour[1] + y] in cells:
 									live_count += 1
 					if live_count == 3:
 						relive.append(dead_neighbour)
