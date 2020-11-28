@@ -14,11 +14,32 @@ import numpy
 
 #Handles the backend of this cellular automata using a numpy array
 def backend(grid, cells, board):
+	#Note that numpy array is (y,x)
+	relive = []
 	for cell in cells:
-		#Numpy displays its matrix as a (y,x) system
-		board[cell[1]][cell[0]] = 1
-	#print(board)
-	print(cells)
+		neighbours = 0
+		for i in range(-1,2):
+			for j in range(-1,2):
+				if i != 0 and j != 0:
+					if cell[cell[0] + i, cell[1] + j] in cells:
+						neighbours += 1
+					dead_neighbour = cell[cell[0] + i, cell[1] + j]
+					live_count = 0
+					for x in range(-1,2):
+						for y in range(-1,2):
+							if x != 0 and y != 0:
+								if cell[dead_neighbour[0] + x, dead_neighbour[1] + y] in cells:
+									live_count += 1
+					if live_count == 3:
+						relive.append(dead_neighbour)
+
+		if neighbours < 2 or neighbours > 3:
+			cells.remove(cell)
+
+		cells += relive
+
+
+
 
 
 
@@ -29,6 +50,9 @@ def board_update(screen, grid, multiplier, board, cells):
 		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, grid * multiplier))
 		# Draw vertical lines
 		pygame.draw.line(screen, (0, 0, 0), (0, i), (grid * multiplier, i))
+
+	for cell in cells:
+		pygame.draw.rect(screen, (0, 0, 0),(cell[0] * multiplier + 1, cell[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 	pygame.display.update()
 
 
@@ -43,18 +67,19 @@ def game(screen, board, grid, cells, Clock, multiplier):
 		if pygame.mouse.get_pressed()[0] and game_start == False:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // multiplier, mouse_pos[1] // multiplier]
-			cells.append(mouse_pos)
+			if mouse_pos not in cells:
+				cells.append(mouse_pos)
 
 		#To start the game
 		if pygame.key.get_pressed()[pygame.K_SPACE]:
 			game_start = True
 
 		if game_start == True:
+			#Set the pace of game once it starts
+			Clock.tick(10)
 			backend(grid, cells, board)
 
 		board_update(screen, grid, multiplier, board, cells)
-		#To set the pace of the game
-		Clock.tick(10)
 			
 
 def main():
@@ -69,4 +94,3 @@ def main():
 	game(screen, board, grid, cells, Clock, 15)
 
 main()
-	
