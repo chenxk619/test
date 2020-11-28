@@ -1,9 +1,7 @@
-a = '1111'
-b = '1111'
+a = '0'
+b = '0'
 a = [int(i) for i in a]
 b = [int(i) for i in b]
-print(a, b)
-
 
 def binary_add(a, b):
 	carry = []
@@ -13,7 +11,6 @@ def binary_add(a, b):
 	elif len(b) > len(a):
 		a = [0] * (len(b) - len(a)) + a
 	summation = [i + j for i, j in zip(a, b)]
-	print(summation)
 	summation = [0] + summation
 	for i in range(len(summation)):
 		carry.append(0)
@@ -40,4 +37,7 @@ def binary_add(a, b):
 	return recursion(summation, carry)
 
 
-print(binary_add(a, b))
+output = ''
+for i in binary_add(a,b):
+	output += str(i)
+print(str(int(output)))
