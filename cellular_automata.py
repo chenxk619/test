@@ -13,8 +13,7 @@ import sys
 import numpy
 
 #Handles the backend of this cellular automata using a numpy array
-def backend(grid, cells):
-	board = numpy.zeros((grid, grid))
+def backend(grid, cells, board):
 	for cell in cells:
 		#Numpy displays its matrix as a (y,x) system
 		board[cell[1]][cell[0]] = 1
@@ -23,7 +22,7 @@ def backend(grid, cells):
 
 
 
-def board_update(screen, grid, multiplier):
+def board_update(screen, grid, multiplier, board, cells):
 	screen.fill((255,255,255))
 	for i in range(0, grid * multiplier + 1, multiplier):
 		# Draw horizontal lines
@@ -33,13 +32,12 @@ def board_update(screen, grid, multiplier):
 	pygame.display.update()
 
 
-def game(screen, grid, cells, Clock, multiplier):
+def game(screen, board, grid, cells, Clock, multiplier):
 	stop, game_start = False, False
 	while stop == False:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
-		board_update(screen, grid, multiplier)
 
 		#Set initial cells when game has not started
 		if pygame.mouse.get_pressed()[0] and game_start == False:
@@ -52,7 +50,9 @@ def game(screen, grid, cells, Clock, multiplier):
 			game_start = True
 
 		if game_start == True:
-			backend(grid, cells)
+			backend(grid, cells, board)
+
+		board_update(screen, grid, multiplier, board, cells)
 		#To set the pace of the game
 		Clock.tick(10)
 			
@@ -63,9 +63,10 @@ def main():
 	size = width, height = 750, 750
 	grid = 50
 	cells = []
+	board = numpy.zeros((grid, grid))
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	game(screen, grid, cells, Clock, 15)
+	game(screen, board, grid, cells, Clock, 15)
 
 main()
 	
