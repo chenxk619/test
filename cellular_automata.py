@@ -60,7 +60,7 @@ def board_update(screen, grid, multiplier, board, cells):
 	pygame.display.update()
 
 
-def game(screen, board, grid, cells, Clock, multiplier):
+def game(screen, board, grid, cells, Clock, multiplier, fps):
 	#If game start is true, starts the game, disallows player to set live cellls and slows down the fps
 	stop, game_start = False, False
 	while stop == False:
@@ -81,7 +81,7 @@ def game(screen, board, grid, cells, Clock, multiplier):
 
 		if game_start == True:
 			#Set the pace of game once it starts
-			Clock.tick(3)
+			Clock.tick(fps)
 			backend(grid, cells, board)
 
 		board_update(screen, grid, multiplier, board, cells)
@@ -93,10 +93,11 @@ def main():
 	size = width, height = 750, 750
 	grid = 50
 	cells = []
+	fps = 7
 	board = numpy.zeros((grid, grid))
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	game(screen, board, grid, cells, Clock, 15)
+	game(screen, board, grid, cells, Clock, 15, fps)
 
 if __name__ == '__main__':
 	main()
