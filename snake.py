@@ -23,9 +23,9 @@ def movement(snake, direction):
 
 	#Moves the head in the right direction
 	if direction == 'up':
-		snake[0] = [snake[0][0], snake[0][1] + 1]
-	elif direction == 'down':
 		snake[0] = [snake[0][0], snake[0][1] - 1]
+	elif direction == 'down':
+		snake[0] = [snake[0][0], snake[0][1] + 1]
 	elif direction == 'left':
 		snake[0] = [snake[0][0] - 1, snake[0][1]]
 	elif direction == 'right':
