@@ -16,29 +16,32 @@ import numpy
 def backend(grid, cells, board):
 	#Note that numpy array is (y,x)
 	relive = []
+	dying = []
 	for cell in cells:
 		neighbours = 0
 		for i in range(-1,2):
 			for j in range(-1,2):
-				if i != 0 and j != 0:
+				if not (i == 0 and j == 0):
 					if [cell[0] + i, cell[1] + j] in cells:
 						neighbours += 1
 					dead_neighbour = [cell[0] + i, cell[1] + j]
 					live_count = 0
 					for x in range(-1,2):
 						for y in range(-1,2):
-							if x != 0 and y != 0:
+							if not( x == 0 and y == 0):
 								if [dead_neighbour[0] + x, dead_neighbour[1] + y] in cells:
 									live_count += 1
 					if live_count == 3:
 						relive.append(dead_neighbour)
 
 		if neighbours < 2 or neighbours > 3:
-			cells.remove(cell)
+			dying.append(cell)
 
-		cells += relive
-
-
+	for i in dying:
+		cells.remove(i)
+	for j in relive:
+		if j not in cells:
+			cells.append(j)
 
 
 
@@ -76,7 +79,7 @@ def game(screen, board, grid, cells, Clock, multiplier):
 
 		if game_start == True:
 			#Set the pace of game once it starts
-			Clock.tick(10)
+			Clock.tick(3)
 			backend(grid, cells, board)
 
 		board_update(screen, grid, multiplier, board, cells)
