@@ -1,5 +1,5 @@
 '''
-The rules of cellular automata
+The rules of cellular automata (Conway game of live)
 
 Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
 Any live cell with two or three live neighbours lives on to the next generation.
@@ -12,11 +12,13 @@ import pygame
 import sys
 import numpy
 
-#Handles the backend of this cellular automata using a numpy array
+
 def backend(grid, cells, board):
 	#Note that numpy array is (y,x)
 	relive = []
 	dying = []
+	#For each of alive cells, check their 8 neighbours to see if they survive, and THEN check each of the neighbours
+	#to see if it should reanimate
 	for cell in cells:
 		neighbours = 0
 		for i in range(-1,2):
@@ -44,8 +46,7 @@ def backend(grid, cells, board):
 			cells.append(j)
 
 
-
-
+#Draw the board, copied my previous code
 def board_update(screen, grid, multiplier, board, cells):
 	screen.fill((255,255,255))
 	for i in range(0, grid * multiplier + 1, multiplier):
@@ -60,6 +61,7 @@ def board_update(screen, grid, multiplier, board, cells):
 
 
 def game(screen, board, grid, cells, Clock, multiplier):
+	#If game start is true, starts the game, disallows player to set live cellls and slows down the fps
 	stop, game_start = False, False
 	while stop == False:
 		for event in pygame.event.get():
@@ -96,4 +98,5 @@ def main():
 	screen = pygame.display.set_mode(size)
 	game(screen, board, grid, cells, Clock, 15)
 
-main()
+if __name__ == '__main__':
+	main()
