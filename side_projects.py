@@ -1,3 +1,4 @@
+# My (bad) recursive implementation of a 2 binary adder (without bin())
 a = '0'
 b = '0'
 a = [int(i) for i in a]
@@ -17,21 +18,25 @@ def binary_add(a, b):
 
 	def recursion(summation, carry):
 
+		#Add carry to summation then clear carry
 		summation = [x + y for x, y in zip(summation, carry)]
-		# print(summation)
 		carry.clear()
 
+		#Make carry a list of 0 of length len(summation) + 1
 		for i in range(len(summation) + 1):
 			carry.append(0)
 
+		#For each 2 in summation, set it to 0, then make that carry[position - 1] a 1.
 		for j in range(len(summation)):
 			if summation[j] == 2:
 				summation[j] = 0
 				if j == 0:
 					j = 1
 				carry[j - 1] = 1
+		#If 1 is still in carry, then do recursion on the summation and carry
 		if 1 in carry:
 			return recursion(summation, carry)
+		#Else, return summation
 		return summation
 
 	return recursion(summation, carry)
