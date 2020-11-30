@@ -39,12 +39,12 @@ class Snake:
 
 
 def board_update(screen, grid, multiplier, snake, apple):
-	screen.fill((255,255,255))
-	for i in range(0, grid * multiplier + 1, multiplier):
-		# Draw horizontal lines
-		pygame.draw.line(screen, (0, 0, 0), (i, 0), (i, grid * multiplier))
-		# Draw vertical lines
-		pygame.draw.line(screen, (0, 0, 0), (0, i), (grid * multiplier, i))
+	screen.fill((0,200,0))
+	# for i in range(0, grid * multiplier + 1, multiplier):
+	# 	# Draw horizontal lines
+	# 	pygame.draw.line(screen, (200, 200, 200), (i, 0), (i, grid * multiplier))
+	# 	# Draw vertical lines
+	# 	pygame.draw.line(screen, (200, 200, 200), (0, i), (grid * multiplier, i))
 
 	#draw the apple
 	pygame.draw.rect(screen, (255, 0, 0),(apple[0] * multiplier + 1, apple[1] * multiplier + 1, multiplier - 1, multiplier - 1))
