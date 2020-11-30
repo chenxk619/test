@@ -38,7 +38,7 @@ class Snake:
 		return apple
 
 
-def board_update(screen, grid, multiplier, snake, apple):
+def board_update(screen, grid, multiplier, snake, apple, text, textRect):
 	screen.fill((0,200,0))
 	# for i in range(0, grid * multiplier + 1, multiplier):
 	# 	# Draw horizontal lines
@@ -51,6 +51,8 @@ def board_update(screen, grid, multiplier, snake, apple):
 
 	for body in snake.body:
 		pygame.draw.rect(screen, (0, 0, 0),(body[0] * multiplier + 1, body[1] * multiplier + 1, multiplier - 1, multiplier - 1))
+
+	screen.blit(text, textRect)
 
 	pygame.display.update()
 
@@ -98,10 +100,17 @@ def game(screen, multiplier, snake, grid, Clock):
 				if apple not in snake.body:
 					leave = True
 			leave = True
-
+		text, textRect = score(snake)
 		Clock.tick(12)
-		board_update(screen, grid, multiplier, snake, apple)
+		board_update(screen, grid, multiplier, snake, apple, text, textRect)
 
+def score(snake):
+	#create a font and render text on it
+	font = pygame.font.Font('freesansbold.ttf', 16)
+	text = font.render('Score : {}'.format(len(snake.body) - 1), True, (0,0,0), (0,200,0))
+	textRect = text.get_rect()
+	textRect.center = (700, 50)
+	return text, textRect
 
 def main():
 	snake = Snake([[25, 25]])
