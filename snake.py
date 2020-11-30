@@ -61,24 +61,33 @@ def game(screen, multiplier, snake, grid, Clock):
 
 	while snake.dead == False:
 		print(snake.dead)
+		key_pressed = False
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
 
-		if (pygame.key.get_pressed()[pygame.K_UP] or snake.direction == 'up') and snake.direction != 'down':
+		if (pygame.key.get_pressed()[pygame.K_UP] or snake.direction == 'up') and snake.direction != 'down' and key_pressed == False:
+			if pygame.key.get_pressed()[pygame.K_UP]:
+				key_pressed = True
 			snake.direction = 'up'
 			apple = snake.movement(apple, grid)
 
-		if (pygame.key.get_pressed()[pygame.K_DOWN] or snake.direction == 'down') and snake.direction != 'up':
+		if (pygame.key.get_pressed()[pygame.K_DOWN] or snake.direction == 'down') and snake.direction != 'up' and key_pressed == False:
+			if pygame.key.get_pressed()[pygame.K_DOWN]:
+				key_pressed = True
 			snake.direction = 'down'
 			apple = snake.movement(apple, grid)
 
-		if (pygame.key.get_pressed()[pygame.K_LEFT] or snake.direction == 'left') and snake.direction != 'right':
+		if (pygame.key.get_pressed()[pygame.K_LEFT] or snake.direction == 'left') and snake.direction != 'right' and key_pressed == False:
+			if pygame.key.get_pressed()[pygame.K_LEFT]:
+				key_pressed = True
 			snake.direction = 'left'
 			apple = snake.movement(apple, grid)
 
-		if (pygame.key.get_pressed()[pygame.K_RIGHT] or snake.direction == 'right') and snake.direction != 'left':
+		if (pygame.key.get_pressed()[pygame.K_RIGHT] or snake.direction == 'right') and snake.direction != 'left' and key_pressed == False:
+			if pygame.key.get_pressed()[pygame.K_RIGHT]:
+				key_pressed = True
 			snake.direction = 'right'
 			apple = snake.movement(apple, grid)
 
@@ -90,9 +99,8 @@ def game(screen, multiplier, snake, grid, Clock):
 					leave = True
 			leave = True
 
-		Clock.tick(10)
+		Clock.tick(12)
 		board_update(screen, grid, multiplier, snake, apple)
-
 
 
 def main():
