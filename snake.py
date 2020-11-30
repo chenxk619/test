@@ -31,10 +31,15 @@ class Snake:
 
 		return self.grow(apple)
 
+	#check if the apple is eaten and return its coords
 	def grow(self, apple):
-		if apple == self.body[-1] and apple is not None:
-			self.body.append(apple)
-			return None
+		if len(apple) == 0:
+			print(apple)
+			return apple
+		elif apple[0] == self.body[-1]:
+			self.body.append(apple[0])
+			del apple[0]
+			return apple
 		return apple
 
 
@@ -48,7 +53,8 @@ def board_update(screen, grid, multiplier, snake, apple, text, textRect):
 		pygame.draw.line(screen, (colour, colour, colour), (0, i), (grid * multiplier, i))
 
 	#draw the apple
-	pygame.draw.rect(screen, (255, 0, 0),(apple[0] * multiplier + 1, apple[1] * multiplier + 1, multiplier - 1, multiplier - 1))
+	for app in apple:
+		pygame.draw.rect(screen, (255, 0, 0),(app[0] * multiplier + 1, app[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	for body in snake.body:
 		pygame.draw.rect(screen, (0, 0, 0),(body[0] * multiplier + 1, body[1] * multiplier + 1, multiplier - 1, multiplier - 1))
@@ -60,10 +66,11 @@ def board_update(screen, grid, multiplier, snake, apple, text, textRect):
 
 
 def game(screen, multiplier, snake, grid, Clock):
-	apple = None
+	#apple is a queue of nested lists that determines if a new apple should be made once one is eaten
+	apple = []
 
 	while snake.dead == False:
-		print(snake.dead)
+		print(apple)
 		key_pressed = False
 
 		for event in pygame.event.get():
@@ -96,10 +103,16 @@ def game(screen, multiplier, snake, grid, Clock):
 
 		leave = False
 		while leave == False:
-			if apple == None:
-				apple = [random.randint(1, grid - 1), random.randint(1, grid - 1)]
-				if apple not in snake.body:
+			if len(apple) == 0:
+				apple.append([random.randint(1, grid - 1), random.randint(1, grid - 1)])
+				if apple[0] not in snake.body:
 					leave = True
+
+			elif apple[0] in snake.body and len(apple) == 1:
+				apple.append([random.randint(1, grid - 1), random.randint(1, grid - 1)])
+				if apple[0] not in snake.body:
+					leave = True
+
 			leave = True
 		text, textRect = score(snake)
 		Clock.tick(12)
