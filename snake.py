@@ -13,13 +13,14 @@ class Snake:
 		# Moves each of the body forward, except the head
 
 		#When an apple is eaten
-		if self.body[-1] == self.body[-2]:
-			for pos in range(len(self.body) - 2, 0, -1):
-				self.body[pos] = self.body[pos - 1]
+		# if len(self.body) > 5:
+		# 	if self.body[-1] == self.body[-2]:
+		# 		for pos in range(len(self.body) - 2, 0, -1):
+		# 			self.body[pos] = self.body[pos - 1]
 		#For other normal cases
-		else:
-			for pos in range(len(self.body) - 1, 0, -1):
-				self.body[pos] = self.body[pos - 1]
+
+		for pos in range(len(self.body) - 1, 0, -1):
+			self.body[pos] = self.body[pos - 1]
 
 		# Moves the head in the right direction
 		if self.direction == 'up':
