@@ -5,17 +5,17 @@ import random
 class Snake:
 	def __init__(self, body):
 		self.body = body
-		self.len = len(self.body)
 		self.direction = 'up'
 
 	def movement(self, apple):
 		# called if the snake has len() > 1
 		# Moves each of the body forward, except the head
 		if self.body[-1] == self.body[-2]:
-			for pos in range(self.len - 2, 0, -1):
+			print('special')
+			for pos in range(len(self.body) - 2, 0, -1):
 				self.body[pos] = self.body[pos - 1]
 		else:
-			for pos in range(self.len - 1, 0, -1):
+			for pos in range(len(self.body) - 1, 0, -1):
 				self.body[pos] = self.body[pos - 1]
 
 		# Moves the head in the right direction
