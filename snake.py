@@ -6,14 +6,17 @@ class Snake:
 	def __init__(self, body):
 		self.body = body
 		self.direction = 'up'
+		self.dead = False
 
 	def movement(self, apple):
 		# called if the snake has len() > 1
 		# Moves each of the body forward, except the head
+
+		#When an apple is eaten
 		if self.body[-1] == self.body[-2]:
-			print('special')
 			for pos in range(len(self.body) - 2, 0, -1):
 				self.body[pos] = self.body[pos - 1]
+		#For other normal cases
 		else:
 			for pos in range(len(self.body) - 1, 0, -1):
 				self.body[pos] = self.body[pos - 1]
@@ -27,6 +30,10 @@ class Snake:
 			self.body[0] = [self.body[0][0] - 1, self.body[0][1]]
 		elif self.direction == 'right':
 			self.body[0] = [self.body[0][0] + 1, self.body[0][1]]
+
+		print(self.body)
+		if self.body[0] in self.body[1:]:
+			self.dead = True
 
 		return self.grow(apple)
 
@@ -45,21 +52,21 @@ def board_update(screen, grid, multiplier, snake, apple):
 		# Draw vertical lines
 		pygame.draw.line(screen, (0, 0, 0), (0, i), (grid * multiplier, i))
 
+	#draw the apple
+	pygame.draw.rect(screen, (255, 0, 0),(apple[0] * multiplier + 1, apple[1] * multiplier + 1, multiplier - 1, multiplier - 1))
+
 	for body in snake.body:
 		pygame.draw.rect(screen, (0, 0, 0),(body[0] * multiplier + 1, body[1] * multiplier + 1, multiplier - 1, multiplier - 1))
-
-	pygame.draw.rect(screen, (255, 0, 0),(apple[0] * multiplier + 1, apple[1] * multiplier + 1, multiplier - 1, multiplier - 1))
 
 	pygame.display.update()
 
 
 
-
 def game(screen, multiplier, snake, grid, Clock):
-	start = True
 	apple = None
 
-	while start == True:
+	while True:
+		print(snake.dead)
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -81,8 +88,6 @@ def game(screen, multiplier, snake, grid, Clock):
 			snake.direction = 'right'
 			apple = snake.movement(apple)
 
-		print(apple, snake.body)
-
 		leave = False
 		while leave == False:
 			if apple == None:
@@ -91,12 +96,13 @@ def game(screen, multiplier, snake, grid, Clock):
 					leave = True
 			leave = True
 
-		Clock.tick(7)
+		Clock.tick(10)
 		board_update(screen, grid, multiplier, snake, apple)
 
 
+
 def main():
-	snake = Snake([[25, 25], [25, 24], [25, 24]])
+	snake = Snake([[25, 25]])
 	multiplier = 15
 	grid = 50
 	pygame.init()
