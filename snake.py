@@ -8,16 +8,9 @@ class Snake:
 		self.direction = 'up'
 		self.dead = False
 
-	def movement(self, apple):
+	def movement(self, apple, grid):
 		# called if the snake has len() > 1
 		# Moves each of the body forward, except the head
-
-		#When an apple is eaten
-		# if len(self.body) > 5:
-		# 	if self.body[-1] == self.body[-2]:
-		# 		for pos in range(len(self.body) - 2, 0, -1):
-		# 			self.body[pos] = self.body[pos - 1]
-		#For other normal cases
 
 		for pos in range(len(self.body) - 1, 0, -1):
 			self.body[pos] = self.body[pos - 1]
@@ -32,8 +25,8 @@ class Snake:
 		elif self.direction == 'right':
 			self.body[0] = [self.body[0][0] + 1, self.body[0][1]]
 
-		print(self.body)
-		if self.body[0] in self.body[1:]:
+		#Snake dies :((((
+		if self.body[0] in self.body[1:] or not (-1 < self.body[0][0] < grid) or not (-1 < self.body[0][1] < grid):
 			self.dead = True
 
 		return self.grow(apple)
@@ -66,7 +59,7 @@ def board_update(screen, grid, multiplier, snake, apple):
 def game(screen, multiplier, snake, grid, Clock):
 	apple = None
 
-	while True:
+	while snake.dead == False:
 		print(snake.dead)
 
 		for event in pygame.event.get():
@@ -75,24 +68,24 @@ def game(screen, multiplier, snake, grid, Clock):
 
 		if (pygame.key.get_pressed()[pygame.K_UP] or snake.direction == 'up') and snake.direction != 'down':
 			snake.direction = 'up'
-			apple = snake.movement(apple)
+			apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_DOWN] or snake.direction == 'down') and snake.direction != 'up':
 			snake.direction = 'down'
-			apple = snake.movement(apple)
+			apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_LEFT] or snake.direction == 'left') and snake.direction != 'right':
 			snake.direction = 'left'
-			apple = snake.movement(apple)
+			apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_RIGHT] or snake.direction == 'right') and snake.direction != 'left':
 			snake.direction = 'right'
-			apple = snake.movement(apple)
+			apple = snake.movement(apple, grid)
 
 		leave = False
 		while leave == False:
 			if apple == None:
-				apple = [random.randint(1,grid), random.randint(1,grid)]
+				apple = [random.randint(1, grid - 1), random.randint(1, grid - 1)]
 				if apple not in snake.body:
 					leave = True
 			leave = True
