@@ -69,14 +69,17 @@ def game(screen, multiplier, snake, grid, Clock):
 	#apple is a queue of nested lists that determines if a new apple should be made once one is eaten
 	apple = []
 
+	#Game will somehow restart once the snake dies
 	while snake.dead == False:
-		print(apple)
 		key_pressed = False
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
 
+		#For each of the movement keys, you can only move if you are not pressing another movement key (determined by
+		#key pressed). Once you are moving in a direction, letting go will allow you to continue moving in that
+		#direction
 		if (pygame.key.get_pressed()[pygame.K_UP] or snake.direction == 'up') and snake.direction != 'down' and key_pressed == False:
 			if pygame.key.get_pressed()[pygame.K_UP]:
 				key_pressed = True
@@ -101,6 +104,8 @@ def game(screen, multiplier, snake, grid, Clock):
 			snake.direction = 'right'
 			apple = snake.movement(apple, grid)
 
+		#To check if a new apple should be added, and that condition is met if an apple is in the snake's body
+		#and if the apple list is of 1 length. Otherwise, it will keep adding more apples non-stop.
 		leave = False
 		while leave == False:
 			if len(apple) == 0:
@@ -122,8 +127,9 @@ def score(snake):
 	#create a font and render text on it
 	font = pygame.font.Font('freesansbold.ttf', 16)
 	text = font.render('Score : {}'.format(len(snake.body) - 1), True, (0,0,0), (0,200,0))
+	#Create the text box
 	textRect = text.get_rect()
-	textRect.center = (700, 50)
+	textRect.center = (700, 30)
 	return text, textRect
 
 def main():
