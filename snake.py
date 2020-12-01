@@ -34,7 +34,6 @@ class Snake:
 	#check if the apple is eaten and return its coords
 	def grow(self, apple):
 		if len(apple) == 0:
-			print(apple)
 			return apple
 		elif apple[0] == self.body[-1]:
 			self.body.append(apple[0])
