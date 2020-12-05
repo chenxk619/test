@@ -1,6 +1,7 @@
 import pygame
 import sys
 import numpy
+import random
 import time
 
 # Game is like a single board instance with unvisited and visited lists as attributes among other things
@@ -10,10 +11,11 @@ import time
 #  Ok, so board size is a bit of a headache. Board should be 750 by 750, but i want the grid to be 15,30,50
 #depending on difficultly
 class Board:
-	def __init__(self, grid_size, resoultion):
+	def __init__(self, grid_size, bomb_perc, resoultion):
 		self.grid = grid_size
 		self.multiplier = resoultion // grid_size
 		self.content = numpy.zeros((grid_size, grid_size))
+		self.bomb_perc = bomb_perc
 		self.unvisited = []
 		self.visited = []
 
@@ -103,8 +105,10 @@ def explore(board, mouse_pos):
 
 def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
-	board = Board(10, width)
+	board = Board(10, width, 10)
 	start = True
+	bomb_list = []
+	additional = 0
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
@@ -113,6 +117,22 @@ def game(screen, width, displacement):
 			grid = Grid((i,j))
 			board.unvisited.append(grid)
 
+
+	#Set a few grids to contain bombs
+	for i in range(len(board.content * board.content) // board.bomb_perc + additional):
+		x = random.randint(0, len(board.content - 1))
+		y = random.randint(0, len(board.content - 1))
+		if [x,y] not in bomb_list:
+			bomb_list.append([x,y])
+		else:
+			additional += 1
+
+	for node in board.unvisited:
+		if [node.pos[0], node.pos[1]] in bomb_list:
+			node.flagged = True
+
+
+	#Main game loop
 	while start:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -120,10 +140,10 @@ def game(screen, width, displacement):
 
 		if pygame.mouse.get_pressed()[0]:
 			mouse_pos = pygame.mouse.get_pos()
-			print(mouse_pos)
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 
 			for node in board.unvisited:
+				#This is needed as mouse_pos is a list, but node.pos is a tuple
 				if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
 					explore(board, mouse_pos)
 
