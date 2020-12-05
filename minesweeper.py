@@ -3,6 +3,10 @@ import sys
 import numpy
 import time
 
+# Game is like a single board instance with unvisited and visited lists as attributes among other things
+# The unvisited lists will be appending with all the grid instances, and each instance will be moved to visited
+# when they are checked.
+
 #  Ok, so board size is a bit of a headache. Board should be 750 by 750, but i want the grid to be 15,30,50
 #depending on difficultly
 class Board:
@@ -38,10 +42,13 @@ def update(screen, board, displacement):
 
 def explore(board, mouse_pos):
 	#Remove the obj that matches the mouse pos in board's unvisited
-	for i in board.unvisited:
-		if i.pos == mouse_pos:
-			board.unvisited.remove(i)
+	target_node = None
+	for node in board.unvisited:
+		if node.pos == mouse_pos:
+			target_node = node
+			board.unvisited.remove(target_node)
 
+	#Flag the number of bombs in its neighbours
 	flags = 0
 	for i in range(-1, 2):
 		for j in range(-1, 2):
@@ -50,6 +57,9 @@ def explore(board, mouse_pos):
 				if board.unvisited[idx].flagged:
 					flags += 1
 
+	#Set the targeted node's flags to the correct amount
+	target_node.flags = flags
+	board.visited.append(target_node)
 
 
 
