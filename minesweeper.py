@@ -3,11 +3,13 @@ import sys
 import numpy
 import time
 
+#  Ok, so board size is a bit of a headache. Board should be 750 by 750, but i want the grid to be 15,30,50
+#depending on difficultly
 class Board:
-	def __init__(self, grid_size):
+	def __init__(self, grid_size, resoultion):
 		self.grid = grid_size
-		self.multiplier = 15
-		self.content = numpy.zeros((self.grid, self.grid))
+		self.multiplier = resoultion // grid_size
+		self.content = numpy.zeros((grid_size, grid_size))
 
 class Grid:
 	def __init__(self, pos):
@@ -16,20 +18,22 @@ class Grid:
 		self.pos = pos
 
 
-def update(screen, board):
-	screen.fill((255,255,255))
+def update(screen, board, displacement):
+	screen_colour = 200
+
+	screen.fill((screen_colour, screen_colour, screen_colour))
 
 	colour = 0
 	for i in range(0, board.grid * board.multiplier + 1, board.multiplier):
 		# Draw horizontal lines
-		pygame.draw.line(screen, (colour, colour, colour), (i, 0), (i, board.grid * board.multiplier))
+		pygame.draw.line(screen, (colour, colour, colour), (i, displacement), (i, board.grid * board.multiplier + displacement))
 		# Draw vertical lines
-		pygame.draw.line(screen, (colour, colour, colour), (0, i), (board.grid * board.multiplier, i))
+		pygame.draw.line(screen, (colour, colour, colour), (0, i + displacement), (board.grid * board.multiplier, i + displacement))
 	pygame.display.update()
 
-def game(screen):
+def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
-	board = Board(50)
+	board = Board(10, width)
 	start = True
 	unvisited = []
 	visited = []
@@ -53,7 +57,7 @@ def game(screen):
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, mouse_pos[1] // board.multiplier]
 
-		update(screen, board)
+		update(screen, board, displacement)
 
 
 
@@ -61,10 +65,11 @@ def main():
 
 	pygame.init()
 	pygame.display.set_caption('Minesweeper')
-	size = width, height = 750, 750
+	displacement = 40
+	size = width, height = 750, 750 + displacement
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	game(screen)
+	game(screen, width, displacement)
 
 while __name__ == '__main__':
 	main()
