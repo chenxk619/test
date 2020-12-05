@@ -10,11 +10,15 @@ class Board:
 		self.grid = grid_size
 		self.multiplier = resoultion // grid_size
 		self.content = numpy.zeros((grid_size, grid_size))
+		self.unvisited = []
+		self.visited = []
+
 
 class Grid:
 	def __init__(self, pos):
 		self.bomb = False
 		self.flagged = False
+		self.flags = 0
 		self.pos = pos
 
 
@@ -31,21 +35,38 @@ def update(screen, board, displacement):
 		pygame.draw.line(screen, (colour, colour, colour), (0, i + displacement), (board.grid * board.multiplier, i + displacement))
 	pygame.display.update()
 
+
+def explore(board, mouse_pos):
+	#Remove the obj that matches the mouse pos in board's unvisited
+	for i in board.unvisited:
+		if i.pos == mouse_pos:
+			board.unvisited.remove(i)
+
+	flags = 0
+	for i in range(-1, 2):
+		for j in range(-1, 2):
+			if not (i == 0 and j == 0):
+				idx = board.unvisited.index((mouse_pos[0] + i, mouse_pos[1] + j))
+				if board.unvisited[idx].flagged:
+					flags += 1
+
+
+
+
+
 def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
 	board = Board(10, width)
 	start = True
-	unvisited = []
-	visited = []
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
 	for i in range(len(board.content)):
 		for j in range(len(board.content[i])):
 			grid = Grid((i,j))
-			unvisited.append(grid)
+			board.unvisited.append(grid)
 
-	for i in unvisited:
+	for i in board.unvisited:
 		print(i.pos)
 
 	while start:
@@ -56,6 +77,8 @@ def game(screen, width, displacement):
 		if pygame.mouse.get_pressed()[0]:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, mouse_pos[1] // board.multiplier]
+			if mouse_pos in board.unvisited:
+				explore(board, mouse_pos)
 
 		update(screen, board, displacement)
 
