@@ -53,7 +53,7 @@ def render_digits(node, visited_colour, board, displacement):
 	return text, textRect
 
 
-def update(screen, board, displacement, bomb_list, dead):
+def update(screen, board, displacement, bomb_list, dead, flag_img, bomb_img):
 	screen_colour = 200
 
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -77,11 +77,7 @@ def update(screen, board, displacement, bomb_list, dead):
 
 	if dead == True:
 		for node in bomb_list:
-			pygame.draw.rect(screen, (255, 0, 0),(node[0] * board.multiplier + 1,
-			node[1] * board.multiplier + 1 + displacement, board.multiplier - 1,board.multiplier - 1))
-
-			pygame.draw.circle(screen, (0, 0, 0), (node[0] * board.multiplier + board.multiplier // 2,
-			node[1] * board.multiplier + board.multiplier // 2 + displacement), board.multiplier // 3)
+			screen.blit(bomb_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	pygame.display.update()
 
@@ -114,12 +110,16 @@ def explore(board, mouse_pos):
 
 
 
-def game(screen, width, displacement):
+def game(screen, width, displacement, flag_img, bomb_img):
 	#The board size should be changed by the difficultly
 	board = Board(10, 20, width)
 	start = True
 	dead = False
 	bomb_list = []
+
+	#Scales the flag and bomb images to fit within the grid
+	flag_img = pygame.transform.scale(flag_img, (board.multiplier, board.multiplier))
+	bomb_img = pygame.transform.scale(bomb_img, (board.multiplier, board.multiplier))
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
@@ -164,7 +164,7 @@ def game(screen, width, displacement):
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 
-		update(screen, board, displacement, bomb_list, dead)
+		update(screen, board, displacement, bomb_list, dead, flag_img, bomb_img)
 
 
 
@@ -179,8 +179,7 @@ def main():
 	size = width, height = 750, 750 + displacement
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	screen.blit(flag_img, (200,200))
-	game(screen, width, displacement)
+	game(screen, width, displacement, flag_img, bomb_img)
 
 while __name__ == '__main__':
 	main()
