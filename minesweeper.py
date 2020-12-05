@@ -104,7 +104,7 @@ def explore(board, mouse_pos):
 
 def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
-	board = Board(10, width, 10)
+	board = Board(10, 10, width)
 	start = True
 	bomb_list = []
 	additional = 0
@@ -118,7 +118,7 @@ def game(screen, width, displacement):
 
 
 	#Set a few grids to contain bombs
-	for i in range(len(board.content * board.content) // board.bomb_perc + additional):
+	for i in range(len((board.content * board.content) // board.bomb_perc) + additional):
 		x = random.randint(0, len(board.content - 1))
 		y = random.randint(0, len(board.content - 1))
 		if [x,y] not in bomb_list:
