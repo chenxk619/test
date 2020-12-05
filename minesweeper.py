@@ -28,7 +28,7 @@ class Grid:
 		self.pos = pos
 
 
-def render_digits(node, visited_colour):
+def render_digits(node, visited_colour, board, displacement):
 
 	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
 	# dark blue, dark red(5), cyan, black, grey
@@ -44,14 +44,16 @@ def render_digits(node, visited_colour):
 	colour_lst = [blue, green, red, dark_blue, dark_red, cyan, black, grey]
 
 	#create a font and render text on it
-	font = pygame.font.SysFont('arial', 10)
+	font = pygame.font.SysFont('arial', board.multiplier // 2)
 	text = font.render('{}'.format(node.flags), True, colour_lst[node.flags - 1], (visited_colour, visited_colour, visited_colour))
 	#Create the text box
 	textRect = text.get_rect()
-	textRect.center = node.pos
+	textRect.center = (node.pos[0] * board.multiplier + board.multiplier // 2, node.pos[1] * board.multiplier + board.multiplier // 2 + displacement)
+
+	return text, textRect
 
 
-def update(screen, board, displacement):
+def update(screen, board, displacement, bomb_list, dead):
 	screen_colour = 200
 
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -70,7 +72,17 @@ def update(screen, board, displacement):
 		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node.pos[0] * board.multiplier + 1,
 		node.pos[1] * board.multiplier + 1 + displacement, board.multiplier - 1, board.multiplier - 1))
 		if node.flags > 0:
-			render_digits(node ,visited_colour)
+			text, textRect = render_digits(node ,visited_colour, board, displacement)
+			screen.blit(text, textRect)
+
+	if dead == True:
+		for node in bomb_list:
+			pygame.draw.rect(screen, (255, 0, 0),(node[0] * board.multiplier + 1,
+			node[1] * board.multiplier + 1 + displacement, board.multiplier - 1,board.multiplier - 1))
+
+			pygame.draw.circle(screen, (0, 0, 0), (node[0] * board.multiplier + board.multiplier // 2,
+			node[1] * board.multiplier + board.multiplier // 2 + displacement), board.multiplier // 3)
+
 	pygame.display.update()
 
 
@@ -92,7 +104,7 @@ def explore(board, mouse_pos):
 				for k in board.unvisited:
 					temp = target_node.pos
 					temp = [temp[0] + i, temp[1] + j]
-					if k.pos == temp and k.flagged:
+					if [k.pos[0], k.pos[1]] == temp and k.bomb:
 						flags += 1
 
 
@@ -104,8 +116,9 @@ def explore(board, mouse_pos):
 
 def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
-	board = Board(10, 10, width)
+	board = Board(10, 20, width)
 	start = True
+	dead = False
 	bomb_list = []
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
@@ -117,13 +130,13 @@ def game(screen, width, displacement):
 
 
 	#Set a few grids to contain bombs
-	while len(bomb_list) != len((board.content * board.content) // board.bomb_perc):
-		x = random.randint(0, len(board.content - 1))
-		y = random.randint(0, len(board.content - 1))
+	while len(bomb_list) != (board.grid * board.grid) * board.bomb_perc//100 :
+		x = random.randint(0, board.grid - 1)
+		y = random.randint(0, board.grid - 1)
 		if [x,y] not in bomb_list:
 			bomb_list.append([x,y])
 
-
+	print(len(bomb_list))
 	for node in board.unvisited:
 		if [node.pos[0], node.pos[1]] in bomb_list:
 			node.bomb = True
@@ -140,14 +153,14 @@ def game(screen, width, displacement):
 
 			#Check if u go KA-BOOOM
 			if mouse_pos in bomb_list:
-				start = False
+				dead = True
 
 			for node in board.unvisited:
 				#This is needed as mouse_pos is a list, but node.pos is a tuple
 				if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
 					explore(board, mouse_pos)
 
-		update(screen, board, displacement)
+		update(screen, board, displacement, bomb_list, dead)
 
 
 
