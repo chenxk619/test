@@ -24,7 +24,7 @@ class Grid:
 	def __init__(self, pos):
 		self.bomb = False
 		self.flagged = False
-		self.flags = 0
+		self.surrounding = 0
 		self.pos = pos
 
 
@@ -45,7 +45,7 @@ def render_digits(node, visited_colour, board, displacement):
 
 	#create a font and render text on it
 	font = pygame.font.SysFont('arial', board.multiplier // 2)
-	text = font.render('{}'.format(node.flags), True, colour_lst[node.flags - 1], (visited_colour, visited_colour, visited_colour))
+	text = font.render('{}'.format(node.surrounding), True, colour_lst[node.surrounding - 1], (visited_colour, visited_colour, visited_colour))
 	#Create the text box
 	textRect = text.get_rect()
 	textRect.center = (node.pos[0] * board.multiplier + board.multiplier // 2, node.pos[1] * board.multiplier + board.multiplier // 2 + displacement)
@@ -71,7 +71,7 @@ def update(screen, board, displacement, bomb_list, dead):
 	for node in board.visited:
 		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node.pos[0] * board.multiplier + 1,
 		node.pos[1] * board.multiplier + 1 + displacement, board.multiplier - 1, board.multiplier - 1))
-		if node.flags > 0:
+		if node.surrounding > 0:
 			text, textRect = render_digits(node ,visited_colour, board, displacement)
 			screen.blit(text, textRect)
 
@@ -109,7 +109,7 @@ def explore(board, mouse_pos):
 
 
 	#Set the targeted node's flags to the correct amount
-	target_node.flags = flags
+	target_node.surrounding = flags
 	board.visited.append(target_node)
 
 
@@ -159,6 +159,10 @@ def game(screen, width, displacement):
 				#This is needed as mouse_pos is a list, but node.pos is a tuple
 				if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
 					explore(board, mouse_pos)
+
+		elif pygame.mouse.get_pressed()[2]:
+			mouse_pos = pygame.mouse.get_pos()
+			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 
 		update(screen, board, displacement, bomb_list, dead)
 
