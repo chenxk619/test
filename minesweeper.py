@@ -107,7 +107,6 @@ def game(screen, width, displacement):
 	board = Board(10, 10, width)
 	start = True
 	bomb_list = []
-	additional = 0
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
@@ -118,18 +117,16 @@ def game(screen, width, displacement):
 
 
 	#Set a few grids to contain bombs
-	for i in range(len((board.content * board.content) // board.bomb_perc) + additional):
+	while len(bomb_list) != len((board.content * board.content) // board.bomb_perc):
 		x = random.randint(0, len(board.content - 1))
 		y = random.randint(0, len(board.content - 1))
 		if [x,y] not in bomb_list:
 			bomb_list.append([x,y])
-		else:
-			additional += 1
+
 
 	for node in board.unvisited:
 		if [node.pos[0], node.pos[1]] in bomb_list:
-			node.flagged = True
-
+			node.bomb = True
 
 	#Main game loop
 	while start:
@@ -140,6 +137,10 @@ def game(screen, width, displacement):
 		if pygame.mouse.get_pressed()[0]:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
+
+			#Check if u go KA-BOOOM
+			if mouse_pos in bomb_list:
+				start = False
 
 			for node in board.unvisited:
 				#This is needed as mouse_pos is a list, but node.pos is a tuple
