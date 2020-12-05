@@ -113,7 +113,7 @@ def explore(board, mouse_pos):
 
 
 
-def game(screen, width, displacement, flag_img, bomb_img):
+def game(screen, width, displacement, flag_img, bomb_img, Clock):
 	#The board size should be changed by the difficultly
 	board = Board(10, 20, width)
 	start = True
@@ -140,7 +140,6 @@ def game(screen, width, displacement, flag_img, bomb_img):
 		if [x,y] not in bomb_list:
 			bomb_list.append([x,y])
 
-	print(len(bomb_list))
 	for node in board.unvisited:
 		if [node.pos[0], node.pos[1]] in bomb_list:
 			node.bomb = True
@@ -171,10 +170,17 @@ def game(screen, width, displacement, flag_img, bomb_img):
 		elif pygame.mouse.get_pressed()[2]:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
-			flag_lst.append(mouse_pos)
+			if mouse_pos not in flag_lst:
+				flag_lst.append(mouse_pos)
 			for node in board.unvisited:
 				if [node.pos[0], node.pos[1]] == mouse_pos:
-					node.flagged = True
+					if node.flagged == False:
+						node.flagged = True
+					else:
+						node.flagged = False
+						flag_lst.remove(mouse_pos)
+
+		Clock.tick(15)
 
 		update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bomb_img)
 
@@ -191,7 +197,7 @@ def main():
 	size = width, height = 750, 750 + displacement
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
-	game(screen, width, displacement, flag_img, bomb_img)
+	game(screen, width, displacement, flag_img, bomb_img, Clock)
 
 while __name__ == '__main__':
 	main()
