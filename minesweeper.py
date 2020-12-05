@@ -172,10 +172,14 @@ def main():
 
 	pygame.init()
 	pygame.display.set_caption('Minesweeper')
+
+	flag_img = pygame.image.load('flag.png')
+	bomb_img = pygame.image.load('minesweeper_bomb.png')
 	displacement = 40
 	size = width, height = 750, 750 + displacement
 	Clock = pygame.time.Clock()
 	screen = pygame.display.set_mode(size)
+	screen.blit(flag_img, (200,200))
 	game(screen, width, displacement)
 
 while __name__ == '__main__':
