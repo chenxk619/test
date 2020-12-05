@@ -53,7 +53,7 @@ def render_digits(node, visited_colour, board, displacement):
 	return text, textRect
 
 
-def update(screen, board, displacement, bomb_list, dead, flag_img, bomb_img):
+def update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bomb_img):
 	screen_colour = 200
 
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -74,6 +74,9 @@ def update(screen, board, displacement, bomb_list, dead, flag_img, bomb_img):
 		if node.surrounding > 0:
 			text, textRect = render_digits(node ,visited_colour, board, displacement)
 			screen.blit(text, textRect)
+
+	for node in flag_lst:
+		screen.blit(flag_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	if dead == True:
 		for node in bomb_list:
@@ -116,6 +119,7 @@ def game(screen, width, displacement, flag_img, bomb_img):
 	start = True
 	dead = False
 	bomb_list = []
+	flag_lst = []
 
 	#Scales the flag and bomb images to fit within the grid
 	flag_img = pygame.transform.scale(flag_img, (board.multiplier, board.multiplier))
@@ -147,24 +151,32 @@ def game(screen, width, displacement, flag_img, bomb_img):
 			if event.type == pygame.QUIT:
 				sys.exit()
 
+		#If a grid clicked on is not flagged
 		if pygame.mouse.get_pressed()[0]:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
-
-			#Check if u go KA-BOOOM
-			if mouse_pos in bomb_list:
-				dead = True
-
 			for node in board.unvisited:
-				#This is needed as mouse_pos is a list, but node.pos is a tuple
-				if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
-					explore(board, mouse_pos)
+				if [node.pos[0], node.pos[1]] == mouse_pos and node.flagged == False:
 
+					#Check if u go KA-BOOOM
+					if mouse_pos in bomb_list:
+						dead = True
+
+					for node in board.unvisited:
+						#This is needed as mouse_pos is a list, but node.pos is a tuple
+						if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
+							explore(board, mouse_pos)
+
+		#Right mouse button to flag shit
 		elif pygame.mouse.get_pressed()[2]:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
+			flag_lst.append(mouse_pos)
+			for node in board.unvisited:
+				if [node.pos[0], node.pos[1]] == mouse_pos:
+					node.flagged = True
 
-		update(screen, board, displacement, bomb_list, dead, flag_img, bomb_img)
+		update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bomb_img)
 
 
 
