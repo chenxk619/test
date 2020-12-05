@@ -26,14 +26,26 @@ class Grid:
 		self.pos = pos
 
 
-def render_digits():
+def render_digits(node):
+
+
+	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
+	# dark blue, dark red(5), cyan, black, grey
+	blue = (0, 0, 150)
+	green = (0, 150, 0)
+	red = (150, 0, 0)
+	dark_blue = (0, 0, 255)
+	dark_red = (255, 0, 0)
+	cyan = (0, 255, 255)
+	black = (0, 0, 0)
+	grey = (150, 150, 150)
+
 	#create a font and render text on it
 	font = pygame.font.SysFont('arial', 10)
-	text = font.render('Score : {}'.format(len(snake.body) - 1), True, (0,0,0), (0,200,0))
+	text = font.render('{}'.format(node.flags), True, (0,0,0), (0,200,0))
 	#Create the text box
 	textRect = text.get_rect()
-	textRect.center = (700, 30)
-	return text, textRect
+	textRect.center = node.pos
 
 
 def update(screen, board, displacement):
@@ -49,14 +61,12 @@ def update(screen, board, displacement):
 		pygame.draw.line(screen, (colour, colour, colour), (0, i + displacement), (board.grid * board.multiplier, i + displacement))
 
 
-	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
-	# dark blue, dark red(5), cyan, black, grey
-
 	#All the visited nodes will be a slightly darker grey
 	visited_colour = 150
 	for node in board.visited:
 		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node[0] * board.multiplier + 1,
 		node[1] * board.multiplier + 1, board.multiplier - 1, board.multiplier - 1))
+		render_digits(node)
 	pygame.display.update()
 
 
