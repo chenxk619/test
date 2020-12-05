@@ -26,6 +26,16 @@ class Grid:
 		self.pos = pos
 
 
+def render_digits():
+	#create a font and render text on it
+	font = pygame.font.SysFont('arial', 10)
+	text = font.render('Score : {}'.format(len(snake.body) - 1), True, (0,0,0), (0,200,0))
+	#Create the text box
+	textRect = text.get_rect()
+	textRect.center = (700, 30)
+	return text, textRect
+
+
 def update(screen, board, displacement):
 	screen_colour = 200
 
