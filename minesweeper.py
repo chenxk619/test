@@ -37,6 +37,16 @@ def update(screen, board, displacement):
 		pygame.draw.line(screen, (colour, colour, colour), (i, displacement), (i, board.grid * board.multiplier + displacement))
 		# Draw vertical lines
 		pygame.draw.line(screen, (colour, colour, colour), (0, i + displacement), (board.grid * board.multiplier, i + displacement))
+
+
+	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
+	# dark blue, dark red(5), cyan, black, grey
+
+	#All the visited nodes will be a slightly darker grey
+	visited_colour = 150
+	for node in board.visited:
+		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node[0] * board.multiplier + 1,
+		node[1] * board.multiplier + 1, board.multiplier - 1, board.multiplier - 1))
 	pygame.display.update()
 
 
@@ -60,7 +70,6 @@ def explore(board, mouse_pos):
 	#Set the targeted node's flags to the correct amount
 	target_node.flags = flags
 	board.visited.append(target_node)
-
 
 
 
