@@ -1,6 +1,7 @@
 import pygame
 import sys
 import numpy
+import random
 import time
 
 # Game is like a single board instance with unvisited and visited lists as attributes among other things
@@ -10,10 +11,11 @@ import time
 #  Ok, so board size is a bit of a headache. Board should be 750 by 750, but i want the grid to be 15,30,50
 #depending on difficultly
 class Board:
-	def __init__(self, grid_size, resoultion):
+	def __init__(self, grid_size, bomb_perc, resoultion):
 		self.grid = grid_size
 		self.multiplier = resoultion // grid_size
 		self.content = numpy.zeros((grid_size, grid_size))
+		self.bomb_perc = bomb_perc
 		self.unvisited = []
 		self.visited = []
 
@@ -26,8 +28,7 @@ class Grid:
 		self.pos = pos
 
 
-def render_digits(node):
-
+def render_digits(node, visited_colour):
 
 	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
 	# dark blue, dark red(5), cyan, black, grey
@@ -40,9 +41,11 @@ def render_digits(node):
 	black = (0, 0, 0)
 	grey = (150, 150, 150)
 
+	colour_lst = [blue, green, red, dark_blue, dark_red, cyan, black, grey]
+
 	#create a font and render text on it
 	font = pygame.font.SysFont('arial', 10)
-	text = font.render('{}'.format(node.flags), True, (0,0,0), (0,200,0))
+	text = font.render('{}'.format(node.flags), True, colour_lst[node.flags - 1], (visited_colour, visited_colour, visited_colour))
 	#Create the text box
 	textRect = text.get_rect()
 	textRect.center = node.pos
@@ -64,17 +67,20 @@ def update(screen, board, displacement):
 	#All the visited nodes will be a slightly darker grey
 	visited_colour = 150
 	for node in board.visited:
-		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node[0] * board.multiplier + 1,
-		node[1] * board.multiplier + 1, board.multiplier - 1, board.multiplier - 1))
-		render_digits(node)
+		pygame.draw.rect(screen, (visited_colour, visited_colour, visited_colour), (node.pos[0] * board.multiplier + 1,
+		node.pos[1] * board.multiplier + 1 + displacement, board.multiplier - 1, board.multiplier - 1))
+		if node.flags > 0:
+			render_digits(node ,visited_colour)
 	pygame.display.update()
 
 
 def explore(board, mouse_pos):
 	#Remove the obj that matches the mouse pos in board's unvisited
 	target_node = None
+
 	for node in board.unvisited:
-		if node.pos == mouse_pos:
+
+		if [node.pos[0], node.pos[1]] == mouse_pos:
 			target_node = node
 			board.unvisited.remove(target_node)
 
@@ -83,9 +89,12 @@ def explore(board, mouse_pos):
 	for i in range(-1, 2):
 		for j in range(-1, 2):
 			if not (i == 0 and j == 0):
-				idx = board.unvisited.index((mouse_pos[0] + i, mouse_pos[1] + j))
-				if board.unvisited[idx].flagged:
-					flags += 1
+				for k in board.unvisited:
+					temp = target_node.pos
+					temp = [temp[0] + i, temp[1] + j]
+					if k.pos == temp and k.flagged:
+						flags += 1
+
 
 	#Set the targeted node's flags to the correct amount
 	target_node.flags = flags
@@ -95,8 +104,10 @@ def explore(board, mouse_pos):
 
 def game(screen, width, displacement):
 	#The board size should be changed by the difficultly
-	board = Board(10, width)
+	board = Board(10, width, 10)
 	start = True
+	bomb_list = []
+	additional = 0
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
@@ -105,9 +116,22 @@ def game(screen, width, displacement):
 			grid = Grid((i,j))
 			board.unvisited.append(grid)
 
-	for i in board.unvisited:
-		print(i.pos)
 
+	#Set a few grids to contain bombs
+	for i in range(len(board.content * board.content) // board.bomb_perc + additional):
+		x = random.randint(0, len(board.content - 1))
+		y = random.randint(0, len(board.content - 1))
+		if [x,y] not in bomb_list:
+			bomb_list.append([x,y])
+		else:
+			additional += 1
+
+	for node in board.unvisited:
+		if [node.pos[0], node.pos[1]] in bomb_list:
+			node.flagged = True
+
+
+	#Main game loop
 	while start:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -115,9 +139,12 @@ def game(screen, width, displacement):
 
 		if pygame.mouse.get_pressed()[0]:
 			mouse_pos = pygame.mouse.get_pos()
-			mouse_pos = [mouse_pos[0] // board.multiplier, mouse_pos[1] // board.multiplier]
-			if mouse_pos in board.unvisited:
-				explore(board, mouse_pos)
+			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
+
+			for node in board.unvisited:
+				#This is needed as mouse_pos is a list, but node.pos is a tuple
+				if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
+					explore(board, mouse_pos)
 
 		update(screen, board, displacement)
 
