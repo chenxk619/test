@@ -53,7 +53,7 @@ def render_digits(node, visited_colour, board, displacement):
 	return text, textRect
 
 
-def update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bomb_img):
+def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img):
 	screen_colour = 200
 
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -79,7 +79,7 @@ def update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bom
 		screen.blit(flag_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	if dead == True:
-		for node in bomb_list:
+		for node in bomb_lst:
 			screen.blit(bomb_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	pygame.display.update()
@@ -111,15 +111,7 @@ def explore(board, mouse_pos):
 	target_node.surrounding = flags
 	board.visited.append(target_node)
 
-
-
-def game(screen, width, displacement, flag_img, bomb_img, Clock):
-	#The board size should be changed by the difficultly
-	board = Board(10, 20, width)
-	start = True
-	dead = False
-	bomb_list = []
-	flag_lst = []
+def setup(board, flag_img, bomb_img, bomb_lst):
 
 	#Scales the flag and bomb images to fit within the grid
 	flag_img = pygame.transform.scale(flag_img, (board.multiplier, board.multiplier))
@@ -134,15 +126,32 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 
 	#Set a few grids to contain bombs
-	while len(bomb_list) != (board.grid * board.grid) * board.bomb_perc//100 :
+	while len(bomb_lst) != (board.grid * board.grid) * board.bomb_perc//100 :
 		x = random.randint(0, board.grid - 1)
 		y = random.randint(0, board.grid - 1)
-		if [x,y] not in bomb_list:
-			bomb_list.append([x,y])
+		if [x,y] not in bomb_lst:
+			bomb_lst.append([x,y])
 
 	for node in board.unvisited:
-		if [node.pos[0], node.pos[1]] in bomb_list:
+		if [node.pos[0], node.pos[1]] in bomb_lst:
 			node.bomb = True
+
+	return flag_img, bomb_img, bomb_lst
+
+
+def game(screen, width, displacement, flag_img, bomb_img, Clock):
+
+	#The board size should be changed by the difficultly
+
+	start = True
+	dead = False
+	game_start = False
+	bomb_lst = []
+	flag_lst = []
+
+	#Intialitial state of board
+	board = Board(1, 1, width)
+
 
 	#Main game loop
 	while start:
@@ -150,15 +159,34 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 			if event.type == pygame.QUIT:
 				sys.exit()
 
+		if game_start == False:
+			if pygame.key.get_pressed()[pygame.K_1]:
+				grid_size, bomb_perc = 15, 10
+				board = Board(grid_size, bomb_perc, width)
+				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
+				game_start = True
+
+			elif pygame.key.get_pressed()[pygame.K_2]:
+				grid_size, bomb_perc = 30, 15
+				board = Board(grid_size, bomb_perc, width)
+				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
+				game_start = True
+
+			elif pygame.key.get_pressed()[pygame.K_3]:
+				grid_size, bomb_perc = 50, 20
+				board = Board(grid_size, bomb_perc, width)
+				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
+				game_start = True
+
 		#If a grid clicked on is not flagged
-		if pygame.mouse.get_pressed()[0]:
+		if pygame.mouse.get_pressed()[0] and game_start:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 			for node in board.unvisited:
 				if [node.pos[0], node.pos[1]] == mouse_pos and node.flagged == False:
 
 					#Check if u go KA-BOOOM
-					if mouse_pos in bomb_list:
+					if mouse_pos in bomb_lst:
 						dead = True
 
 					for node in board.unvisited:
@@ -167,7 +195,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 							explore(board, mouse_pos)
 
 		#Right mouse button to flag shit
-		elif pygame.mouse.get_pressed()[2]:
+		elif pygame.mouse.get_pressed()[2] and game_start:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 			if mouse_pos not in flag_lst:
@@ -182,7 +210,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 		Clock.tick(15)
 
-		update(screen, board, displacement, bomb_list, dead, flag_lst, flag_img, bomb_img)
+		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img)
 
 
 
