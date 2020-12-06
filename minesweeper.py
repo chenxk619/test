@@ -28,6 +28,8 @@ class Grid:
 		self.pos = pos
 
 
+
+#To render all the digits shown on a node when it is not a bomb (only if there is more than 1 surrounding bomb)
 def render_digits(node, visited_colour, board, displacement):
 
 	# For visited nodes, the colour of their number, in order of increasing flags will be : NIL(0), blue, green, red,
@@ -54,11 +56,29 @@ def render_digits(node, visited_colour, board, displacement):
 
 
 
+#Used to convey the difficulty choosing at the start, and to show the flags remaining and timer
+def render_text(text_shown, pos):
 
-def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img):
+	font = pygame.font.SysFont('arial', 20)
+	text = font.render(text_shown, True, (0,0,0), (200, 200, 200))
+
+	textRect = text.get_rect()
+	textRect.center = pos
+
+	return text, textRect
+
+
+
+#Basically a board update function, to fill the screen, draw the lines, to draw all the visited and flagged nodes
+#and to show the bombs if you die.
+def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos):
+
 	screen_colour = 200
-
 	screen.fill((screen_colour, screen_colour, screen_colour))
+
+	#At the start to display the text
+	if len(board.unvisited) == 0:
+		screen.blit(intial_text, intial_pos)
 
 	colour = 0
 	for i in range(0, board.grid * board.multiplier + 1, board.multiplier):
@@ -77,14 +97,17 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 			text, textRect = render_digits(node ,visited_colour, board, displacement)
 			screen.blit(text, textRect)
 
+	#Display flags clicked on
 	for node in flag_lst:
 		screen.blit(flag_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
+	#Show bombs if dead
 	if dead == True:
 		for node in bomb_lst:
 			screen.blit(bomb_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	pygame.display.update()
+
 
 
 #Explore function used to check the number of surrounding bombs in a certain node's vercinity (only called when a node is
@@ -114,6 +137,7 @@ def explore(board, mouse_pos):
 	#Set the targeted node's flags to the correct amount
 	target_node.surrounding = flags
 	board.visited.append(target_node)
+
 
 
 #Setup used to scale the flag_img, bomb_img. Also to append grid instances to board attribute and to set a few grids
@@ -146,10 +170,10 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 	return flag_img, bomb_img, bomb_lst
 
 
+
 def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 	#The board size should be changed by the difficultly
-
 	start = True
 	dead = False
 	game_start = False
@@ -158,7 +182,9 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 	#Intialitial state of board
 	board = Board(1, 1, width)
-
+	text_shown = 'Enter 1, 2 or 3 to correspond to easy, normal or hard'
+	pos = (350, 200)
+	intial_text, intial_pos = render_text(text_shown, pos)
 
 	#Main game loop
 	while start:
@@ -217,7 +243,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 		Clock.tick(15)
 
-		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img)
+		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos)
 
 
 
