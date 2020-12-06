@@ -57,13 +57,23 @@ def render_digits(node, visited_colour, board, displacement):
 
 
 #Used to convey the difficulty choosing at the start, and to show the flags remaining and timer
-def render_text(text_shown, pos):
+def render_text(text_shown, pos, bomb_lst, flag_lst):
 
-	font = pygame.font.SysFont('arial', 20)
-	text = font.render(text_shown, True, (0,0,0), (200, 200, 200))
+	if text_shown == '':
+		font = pygame.font.SysFont('arial', 20)
+		num = len(bomb_lst) - len(flag_lst)
+		text = font.render(str(num), True, (0, 0, 0), (200, 200, 200))
 
-	textRect = text.get_rect()
-	textRect.center = pos
+		textRect = text.get_rect()
+		textRect.center = pos
+
+	else:
+
+		font = pygame.font.SysFont('arial', 20)
+		text = font.render(text_shown, True, (0,0,0), (200, 200, 200))
+
+		textRect = text.get_rect()
+		textRect.center = pos
 
 	return text, textRect
 
@@ -71,7 +81,8 @@ def render_text(text_shown, pos):
 
 #Basically a board update function, to fill the screen, draw the lines, to draw all the visited and flagged nodes
 #and to show the bombs if you die.
-def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos):
+def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect):
+
 
 	screen_colour = 200
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -105,6 +116,8 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 	if dead == True:
 		for node in bomb_lst:
 			screen.blit(bomb_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
+
+	screen.blit(flag_text, flag_rect)
 
 	pygame.display.update()
 
@@ -184,7 +197,9 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 	board = Board(1, 1, width)
 	text_shown = 'Enter 1, 2 or 3 to correspond to easy, normal or hard'
 	pos = (350, 200)
-	intial_text, intial_pos = render_text(text_shown, pos)
+	intial_text, intial_pos = render_text(text_shown, pos, bomb_lst, flag_lst)
+
+	flag_text, flag_rect = intial_text, intial_pos
 
 	#Main game loop
 	while start:
@@ -228,22 +243,29 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 							explore(board, mouse_pos)
 
 		#Right mouse button to flag shit
-		elif pygame.mouse.get_pressed()[2] and game_start:
+		if pygame.mouse.get_pressed()[2] and game_start:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
-			if mouse_pos not in flag_lst:
-				flag_lst.append(mouse_pos)
+
 			for node in board.unvisited:
 				if [node.pos[0], node.pos[1]] == mouse_pos:
 					if node.flagged == False:
 						node.flagged = True
+						if mouse_pos not in flag_lst:
+							flag_lst.append(mouse_pos)
 					else:
 						node.flagged = False
-						flag_lst.remove(mouse_pos)
+						if mouse_pos in flag_lst:
+							flag_lst.remove(mouse_pos)
+
+		#Render the number of flags left
+		if game_start:
+			flag_pos = (600, 20)
+			flag_text, flag_rect = render_text('', flag_pos, bomb_lst, flag_lst)
 
 		Clock.tick(15)
 
-		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos)
+		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect)
 
 
 
