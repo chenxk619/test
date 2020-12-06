@@ -53,6 +53,8 @@ def render_digits(node, visited_colour, board, displacement):
 	return text, textRect
 
 
+
+
 def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img):
 	screen_colour = 200
 
@@ -85,6 +87,8 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 	pygame.display.update()
 
 
+#Explore function used to check the number of surrounding bombs in a certain node's vercinity (only called when a node is
+#clicked)
 def explore(board, mouse_pos):
 	#Remove the obj that matches the mouse pos in board's unvisited
 	target_node = None
@@ -111,6 +115,9 @@ def explore(board, mouse_pos):
 	target_node.surrounding = flags
 	board.visited.append(target_node)
 
+
+#Setup used to scale the flag_img, bomb_img. Also to append grid instances to board attribute and to set a few grids
+#to contain bombs
 def setup(board, flag_img, bomb_img, bomb_lst):
 
 	#Scales the flag and bomb images to fit within the grid
