@@ -121,6 +121,11 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 
 	pygame.display.update()
 
+	if dead == True:
+		time.sleep(3)
+		return False
+	return True
+
 
 
 #Explore function used to check the number of surrounding bombs in a certain node's vercinity (only called when a node is
@@ -265,7 +270,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 		Clock.tick(15)
 
-		update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect)
+		start = update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect)
 
 
 
