@@ -168,16 +168,21 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
-	for i in range(len(board.content)):
-		for j in range(len(board.content[i])):
+	for i in range(board.grid):
+		for j in range(board.grid):
 			grid = Grid((i,j))
+
+			#For grid in this range dont have to worry about bomb
+			if i in range(board.grid // 2 - 1, board.grid // 2 ) and j in range(board.grid // 2 - 1, board.grid // 2 ):
+				board.visited.append(grid)
+
 			board.unvisited.append(grid)
 
 
 	#Set a few grids to contain bombs
 	while len(bomb_lst) != (board.grid * board.grid) * board.bomb_perc//100 :
-		x = random.randint(0, board.grid - 1)
-		y = random.randint(0, board.grid - 1)
+		x = random.choice([random.randint(0, board.grid // 2 -2), random.randint(board.grid // 2 + 2, board.grid - 1)])
+		y = random.choice([random.randint(0, board.grid // 2 -2), random.randint(board.grid // 2 + 2, board.grid - 1)])
 		if [x,y] not in bomb_lst:
 			bomb_lst.append([x,y])
 
