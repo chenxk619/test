@@ -200,8 +200,10 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 	start = True
 	dead = False
 	game_start = False
+	button = set()
 	bomb_lst = []
 	flag_lst = []
+
 
 	#Intialitial state of board
 	board = Board(1, 1, width)
@@ -213,9 +215,21 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 	#Main game loop
 	while start:
+
+		button_up = False
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				sys.exit()
+
+			#The next 2 events are to check if a mouse 2 is pressed and THEN released, which is crucial for the flagging
+			#mechanic, otherwise it would flag on and off rapidly
+			if pygame.mouse.get_pressed()[2]:
+				button.add(1)
+
+			if event.type == pygame.MOUSEBUTTONUP and len(button) == 1:
+				button.clear()
+				button_up = True
 
 		if game_start == False:
 			if pygame.key.get_pressed()[pygame.K_1]:
@@ -252,8 +266,9 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 						if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
 							explore(board, mouse_pos)
 
-		#Right mouse button to flag shit
-		if pygame.mouse.get_pressed()[2] and game_start:
+
+		#Right mouse button to flag shit, but only if the button_up flag from earlier is True
+		if button_up and game_start:
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 
@@ -268,12 +283,13 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 						if mouse_pos in flag_lst:
 							flag_lst.remove(mouse_pos)
 
+
 		#Render the number of flags left
 		if game_start:
 			flag_pos = (600, 20)
 			flag_text, flag_rect = render_text('', flag_pos, bomb_lst, flag_lst)
 
-		Clock.tick(15)
+		Clock.tick(20)
 
 		start = update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect)
 
