@@ -146,7 +146,7 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 
 	# End game condition
 	if dead or won:
-		time.sleep(23)
+		time.sleep(3)
 		return False
 	return True
 
