@@ -62,7 +62,7 @@ def render_text(text_shown, pos, bomb_lst, flag_lst):
 	if text_shown == '':
 		font = pygame.font.SysFont('arial', 20)
 		num = len(bomb_lst) - len(flag_lst)
-		text = font.render(str(num), True, (0, 0, 0), (200, 200, 200))
+		text = font.render('Bombs remaining : ' + str(num), True, (0, 0, 0), (200, 200, 200))
 
 		textRect = text.get_rect()
 		textRect.center = pos
@@ -81,8 +81,7 @@ def render_text(text_shown, pos, bomb_lst, flag_lst):
 
 #Basically a board update function, to fill the screen, draw the lines, to draw all the visited and flagged nodes
 #and to show the bombs if you die.
-def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect):
-
+def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect, game_start):
 
 	screen_colour = 200
 	screen.fill((screen_colour, screen_colour, screen_colour))
@@ -113,15 +112,34 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 		screen.blit(flag_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
 
 	#Show bombs if dead
-	if dead == True:
+	if dead:
 		for node in bomb_lst:
 			screen.blit(bomb_img, (node[0] * board.multiplier + 1, node[1] * board.multiplier + 1 + displacement))
+
+	#Check if you won
+	won = False
+
+	if game_start:
+
+		won = True
+
+		for node in board.unvisited:
+			if not node.bomb:
+				won = False
+
+		if won:
+			print('won')
+			won = True
+			text_shown = 'Congrats! You did not explode'
+			pos = (350, 20)
+			won_text, won_pos = render_text(text_shown, pos, bomb_lst, flag_lst)
+			screen.blit(won_text, won_pos)
 
 	screen.blit(flag_text, flag_rect)
 
 	pygame.display.update()
 
-	if dead == True:
+	if dead or won:
 		time.sleep(3)
 		return False
 	return True
@@ -231,6 +249,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 				button.clear()
 				button_up = True
 
+		#Before the game starts, this is used to choose the difficulty settings
 		if game_start == False:
 			if pygame.key.get_pressed()[pygame.K_1]:
 				grid_size, bomb_perc = 15, 10
@@ -283,6 +302,14 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 						if mouse_pos in flag_lst:
 							flag_lst.remove(mouse_pos)
 
+		#Instant solve for dev use
+		if pygame.mouse.get_pressed()[1] and pygame.key.get_pressed()[pygame.K_z]:
+			print('solve')
+			for node in board.unvisited:
+				if not node.bomb:
+					board.unvisited.remove(node)
+					board.visited.append(node)
+
 
 		#Render the number of flags left
 		if game_start:
@@ -291,7 +318,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 		Clock.tick(20)
 
-		start = update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect)
+		start = update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb_img, intial_text, intial_pos, flag_text, flag_rect, game_start)
 
 
 
