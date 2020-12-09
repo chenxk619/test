@@ -135,6 +135,13 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 	#Update the number of bombs left
 	screen.blit(flag_text, flag_rect)
 
+	#Update time
+	if game_start:
+		time_pos = (50, 20)
+		time_text = time.time() - start_time
+		time_text, time_pos = render_text('Time: ' + str(int(time_text)), time_pos, bomb_lst, flag_lst)
+		screen.blit(time_text, time_pos)
+
 	pygame.display.update()
 
 	# End game condition
@@ -222,6 +229,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 	button = set()
 	bomb_lst = []
 	flag_lst = []
+	start_time = 0
 
 
 	# Intialitial state of board
@@ -259,18 +267,18 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 				game_start = True
 
 			elif pygame.key.get_pressed()[pygame.K_2]:
-				grid_size, bomb_perc = 30, 15
+				grid_size, bomb_perc = 25, 15
 				board = Board(grid_size, bomb_perc, width)
 				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
 				game_start = True
 
 			elif pygame.key.get_pressed()[pygame.K_3]:
-				grid_size, bomb_perc = 50, 20
+				grid_size, bomb_perc = 35, 20
 				board = Board(grid_size, bomb_perc, width)
 				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
 				game_start = True
 
-		if game_start:
+		if game_start and start_time == 0:
 			start_time = time.time()
 
 		# If a grid clicked on is not flagged
