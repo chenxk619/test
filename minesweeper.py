@@ -146,7 +146,7 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 
 	# End game condition
 	if dead or won:
-		time.sleep(3)
+		time.sleep(23)
 		return False
 	return True
 
@@ -198,7 +198,7 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 			grid = Grid((i,j))
 
 			# For grid in this range dont have to worry about bomb
-			if i in range(board.grid // 2 - 1, board.grid // 2 ) and j in range(board.grid // 2 - 1, board.grid // 2 ):
+			if i in range(board.grid // 2 , board.grid // 2 + 1) and j in range(board.grid // 2 , board.grid // 2 + 1):
 				start_pos = grid
 				board.visited.append(start_pos)
 
@@ -207,9 +207,9 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 
 	# Set a few grids to contain bombs
 	while len(bomb_lst) != (board.grid * board.grid) * board.bomb_perc//100 :
-		x = random.choice([random.randint(0, board.grid // 2 -2), random.randint(board.grid // 2 + 2, board.grid - 1)])
-		y = random.choice([random.randint(0, board.grid // 2 -2), random.randint(board.grid // 2 + 2, board.grid - 1)])
-		if [x,y] not in bomb_lst:
+		x = random.randint(0, board.grid - 1)
+		y = random.randint(0, board.grid - 1)
+		if [x,y] not in bomb_lst and not (x in range(board.grid // 2 - 1, board.grid // 2 + 2) and y in range(board.grid // 2 - 1, board.grid // 2 + 2)):
 			bomb_lst.append([x,y])
 
 	for node in board.unvisited:
@@ -273,7 +273,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 				game_start = True
 
 			elif pygame.key.get_pressed()[pygame.K_3]:
-				grid_size, bomb_perc = 35, 20
+				grid_size, bomb_perc = 30, 20
 				board = Board(grid_size, bomb_perc, width)
 				flag_img, bomb_img, bomb_lst = setup(board, flag_img, bomb_img, bomb_lst)
 				game_start = True
