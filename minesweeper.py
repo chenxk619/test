@@ -135,6 +135,7 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 			won_text, won_pos = render_text(text_shown, pos, bomb_lst, flag_lst)
 			screen.blit(won_text, won_pos)
 
+	#Update all
 	screen.blit(flag_text, flag_rect)
 
 	pygame.display.update()
@@ -146,8 +147,8 @@ def update(screen, board, displacement, bomb_lst, dead, flag_lst, flag_img, bomb
 
 
 
-#Explore function used to check the number of surrounding bombs in a certain node's vercinity (only called when a node is
-#clicked)
+#Explore function used to check the number of surrounding bombs in a certain node's vercinity (only called when a node
+# is clicked)
 def explore(board, mouse_pos):
 	#Remove the obj that matches the mouse pos in board's unvisited
 	target_node = None
@@ -186,16 +187,18 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 
 	#loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	#them to unvisited
+	start_pos = None
 	for i in range(board.grid):
 		for j in range(board.grid):
 			grid = Grid((i,j))
 
 			#For grid in this range dont have to worry about bomb
 			if i in range(board.grid // 2 - 1, board.grid // 2 ) and j in range(board.grid // 2 - 1, board.grid // 2 ):
-				board.visited.append(grid)
+				start_pos = grid
+				board.visited.append(start_pos)
 
-			board.unvisited.append(grid)
-
+			if grid not in board.visited:
+				board.unvisited.append(grid)
 
 	#Set a few grids to contain bombs
 	while len(bomb_lst) != (board.grid * board.grid) * board.bomb_perc//100 :
@@ -233,6 +236,8 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 	#Main game loop
 	while start:
+
+		#print(len(board.unvisited), len(board.visited))
 
 		button_up = False
 
