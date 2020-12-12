@@ -159,8 +159,8 @@ def main():
 	visited, unvisited, barricades, node_path= set(), set(), [[0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5]], []
 	while [end.node_pos] != [start.node_pos]:
 		find(start,end, visited, unvisited, node_path, barricades)
-		#draw(start, end, visited, unvisited, node_path, barricades)
-		#print('=============')
+		draw(start, end, visited, unvisited, node_path, barricades)
+		print('=============')
 
 
 if __name__ == '__main__':
