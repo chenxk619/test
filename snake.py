@@ -67,9 +67,11 @@ def board_update(screen, grid, multiplier, snake, apple, text, textRect):
 def game(screen, multiplier, snake, grid, Clock):
 	#apple is a queue of nested lists that determines if a new apple should be made once one is eaten
 	apple = []
+	counter = 0
 
 	#Game will somehow restart once the snake dies
 	while snake.dead == False:
+		counter += 1
 		key_pressed = False
 
 		for event in pygame.event.get():
@@ -83,25 +85,29 @@ def game(screen, multiplier, snake, grid, Clock):
 			if pygame.key.get_pressed()[pygame.K_UP]:
 				key_pressed = True
 			snake.direction = 'up'
-			apple = snake.movement(apple, grid)
+			if counter % 3 == 0:
+				apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_DOWN] or snake.direction == 'down') and snake.direction != 'up' and key_pressed == False:
 			if pygame.key.get_pressed()[pygame.K_DOWN]:
 				key_pressed = True
 			snake.direction = 'down'
-			apple = snake.movement(apple, grid)
+			if counter % 3 == 0:
+				apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_LEFT] or snake.direction == 'left') and snake.direction != 'right' and key_pressed == False:
 			if pygame.key.get_pressed()[pygame.K_LEFT]:
 				key_pressed = True
 			snake.direction = 'left'
-			apple = snake.movement(apple, grid)
+			if counter % 3 == 0:
+				apple = snake.movement(apple, grid)
 
 		if (pygame.key.get_pressed()[pygame.K_RIGHT] or snake.direction == 'right') and snake.direction != 'left' and key_pressed == False:
 			if pygame.key.get_pressed()[pygame.K_RIGHT]:
 				key_pressed = True
 			snake.direction = 'right'
-			apple = snake.movement(apple, grid)
+			if counter % 3 == 0:
+				apple = snake.movement(apple, grid)
 
 		#To check if a new apple should be added, and that condition is met if an apple is in the snake's body
 		#and if the apple list is of 1 length. Otherwise, it will keep adding more apples non-stop.
@@ -119,7 +125,7 @@ def game(screen, multiplier, snake, grid, Clock):
 
 			leave = True
 		text, textRect = score(snake)
-		Clock.tick(12)
+		Clock.tick(60)
 		board_update(screen, grid, multiplier, snake, apple, text, textRect)
 
 def score(snake):
