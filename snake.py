@@ -125,7 +125,7 @@ def game(screen, multiplier, snake, grid, Clock):
 
 			leave = True
 		text, textRect = score(snake)
-		Clock.tick(60)
+		Clock.tick(45)
 		board_update(screen, grid, multiplier, snake, apple, text, textRect)
 
 def score(snake):
