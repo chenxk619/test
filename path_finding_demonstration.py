@@ -1,9 +1,6 @@
 import pygame
 import sys
 
-
-
-
 def render():
 	pass
 
