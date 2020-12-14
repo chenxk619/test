@@ -286,7 +286,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 			mouse_pos = pygame.mouse.get_pos()
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 			for node in board.unvisited:
-				if [node.pos[0], node.pos[1]] == mouse_pos and node.flagged == False:
+				if mouse_pos == node.pos and node.flagged == False:
 
 					# Check if u go KA-BOOOM
 					if mouse_pos in bomb_lst:
@@ -294,7 +294,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 
 					for node in board.unvisited:
 						# This is needed as mouse_pos is a list, but node.pos is a tuple
-						if mouse_pos[0] == node.pos[0] and mouse_pos[1] == node.pos[1]:
+						if mouse_pos == node.pos:
 							explore(board, mouse_pos)
 
 
@@ -304,7 +304,7 @@ def game(screen, width, displacement, flag_img, bomb_img, Clock):
 			mouse_pos = [mouse_pos[0] // board.multiplier, (mouse_pos[1] - displacement) // board.multiplier]
 
 			for node in board.unvisited:
-				if [node.pos[0], node.pos[1]] == mouse_pos:
+				if node.pos == mouse_pos:
 					if node.flagged == False:
 						node.flagged = True
 						if mouse_pos not in flag_lst:
