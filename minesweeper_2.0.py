@@ -16,15 +16,14 @@ class Board:
 		self.multiplier = resoultion // grid_size
 		self.content = numpy.zeros((grid_size, grid_size))
 		self.bomb_perc = bomb_perc
-		self.unvisited = []
-		self.visited = []
-
 
 class Grid:
 	def __init__(self, pos):
 		self.bomb = False
 		self.flagged = False
 		self.surrounding = 0
+		self.visited = False
+		self.unvisited = True
 		self.pos = pos
 
 
@@ -193,9 +192,10 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 	# loops through the vertical and horizontal length of board, then initializes each coordinate as a grid, then append
 	# them to unvisited
 	start_pos = None
+
 	for i in range(board.grid):
 		for j in range(board.grid):
-			grid = Grid((i,j))
+			board.content[i][j] = Grid([i,j])
 
 			# For grid in this range dont have to worry about bomb
 			if i in range(board.grid // 2 , board.grid // 2 + 1) and j in range(board.grid // 2 , board.grid // 2 + 1):
