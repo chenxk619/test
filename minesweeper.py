@@ -160,7 +160,7 @@ def explore(board, mouse_pos):
 
 	for node in board.unvisited:
 
-		if [node.pos[0], node.pos[1]] == mouse_pos:
+		if node.pos == mouse_pos:
 			target_node = node
 			board.unvisited.remove(target_node)
 
@@ -172,7 +172,7 @@ def explore(board, mouse_pos):
 				for k in board.unvisited:
 					temp = target_node.pos
 					temp = [temp[0] + i, temp[1] + j]
-					if [k.pos[0], k.pos[1]] == temp and k.bomb:
+					if k.pos == temp and k.bomb:
 						flags += 1
 
 
@@ -195,7 +195,7 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 	start_pos = None
 	for i in range(board.grid):
 		for j in range(board.grid):
-			grid = Grid((i,j))
+			grid = Grid([i,j])
 
 			# For grid in this range dont have to worry about bomb
 			if i in range(board.grid // 2 , board.grid // 2 + 1) and j in range(board.grid // 2 , board.grid // 2 + 1):
@@ -213,7 +213,7 @@ def setup(board, flag_img, bomb_img, bomb_lst):
 			bomb_lst.append([x,y])
 
 	for node in board.unvisited:
-		if [node.pos[0], node.pos[1]] in bomb_lst:
+		if node.pos in bomb_lst:
 			node.bomb = True
 
 	return flag_img, bomb_img, bomb_lst
