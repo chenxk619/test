@@ -50,9 +50,9 @@ class Nodes:
 			else:
 				return (((10 * x_distance) ** 2 + (10 * x_distance) ** 2) ** 0.5) + (10 * (y_distance - x_distance))
 
-
 def find(start, end, visited, unvisited, node_path, barricades):
 	stop = False
+	smallest_H = -20000
 	#first time visiting the board
 	if len(visited) == 0:
 		visited.add(start)
@@ -71,7 +71,6 @@ def find(start, end, visited, unvisited, node_path, barricades):
 
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
 					unvisited.add(Nodes(start.node_pos, end.node_pos, [start.node_pos[0] , start.node_pos[1]], [i, j], 0))
-
 
 	else:
 		#find the smallest H_cost node in unvisited list, then set it to visited and find the unvisited nodes around it
@@ -101,18 +100,15 @@ def find(start, end, visited, unvisited, node_path, barricades):
 						#To get the fastest path, from the end node, find the nearest node to the start node
 						backtrack_node_pos = [end.node_pos]
 						while backtrack_node_pos != [start.node_pos]:
-							try:
-								#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
-								candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
-											  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
-								#backtrack node set to the node_pos in candidates
-								backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
-								#Add correct nodes to node_path
-								node_path.append(backtrack_node_pos)
-								#Remove the set of previous node pos
-								visited -= candidates
-							except IndexError:
-								stop = True
+							#Candidates of nodes whose position is within +-1 range (x,y) of the backtrack node, and has the smallest G_cost value(distance from start)
+							candidates = set(node for node in visited if abs(backtrack_node_pos[0][0] - node.node_pos[0]) < 2
+										  and abs(backtrack_node_pos[0][1] - node.node_pos[1]) < 2)
+							#backtrack node set to the node_pos in candidates
+							backtrack_node_pos = [node.node_pos for node in candidates if node.G_cost == min([k.G_cost for k in candidates])]
+							#Add correct nodes to node_path
+							node_path.append(backtrack_node_pos)
+							#Remove the set of previous node pos
+							visited -= candidates
 
 
 					#Instantiate the Nodes surrounding the start node and append them to unvisited list
