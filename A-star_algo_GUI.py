@@ -1,7 +1,6 @@
 import pygame
 import sys
 import time
-#from A_star_algo import *
 
 class Board:
 	x_length = 50
@@ -169,7 +168,7 @@ def game(start_pos, end_pos, screen, multiplier):
 	visited, unvisited, node_path, barricades = set(), set(), [], []
 
 	#Main game loop
-	while stop == False:
+	while not stop:
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -229,6 +228,7 @@ def main():
 	size = width, height = 50 * multiplier, 50 * multiplier
 	screen = pygame.display.set_mode(size)
 	game(None, None, screen, multiplier)
-	time.sleep(5)
+	time.sleep(3)
 
-main()
+while __name__ == '__main__':
+	main()
