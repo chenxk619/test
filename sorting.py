@@ -18,8 +18,10 @@ class Sorts:
 	# positions 2 by 2. If we are at the end of the list and no swaps occur, return list
 
 	def bubble_sort(self):
+
 		start = time.time()
 		self.latest = 'bubble_sort'
+
 		while True:
 			sort_done = True
 			for i in range(len(self.array[:-1])):
@@ -35,8 +37,10 @@ class Sorts:
 	# order(as elements ahead of i will be sorted) so you don't need to loop it.
 
 	def insertion_sort(self):
+
 		start = time.time()
 		self.latest = 'insertion_sort'
+
 		for i in range(1, len(self.array)):
 			for j in range(i - 1, -1, -1):
 				if self.array[j] > self.array[j + 1]:
@@ -53,6 +57,7 @@ class Sorts:
 	# [4,2,6,7,8] - [4,2] [6,7,8] - [2,4] [6,7,8]
 
 	def quick_sort(self):
+
 		start = time.time()
 		self.latest = 'quick_sort'
 
@@ -82,16 +87,16 @@ class Sorts:
 	# is automatically added to output array.
 
 	def merge_sort(self):
+
 		start = time.time()
 		self.latest = 'merge_sort'
+
 		def sort(lst):
-			print(lst)
 			i, j = 0, 0
 			output = []
 
 			if len(lst) > 1:
 				mid = len(lst) // 2
-				# print(lst[:mid])
 				arr1 = sort(lst[:mid])
 				arr2 = sort(lst[mid:])
 				# Merge the two lists together to a output list
@@ -117,9 +122,42 @@ class Sorts:
 		self.time_taken = time.time() - start
 
 
+	def heap_sort(self):
+		start = time.time()
+		self.latest = 'heap_sort'
+
+		def heapify(index):
+			left = index * 2
+			right = index * 2 + 1
+
+			if left > len(self.array) - 1 or right > len(self.array) - 1:
+				return
+
+			elif self.array[left] < self.array[index] and self.array[left] < self.array[right]:
+				self.array[left] , self.array[index] = self.array[index], self.array[left]
+				return heapify(left)
+
+			elif self.array[right] < self.array[index] and self.array[right] < self.array[left]:
+				self.array[index], self.array[right] = self.array[right], self.array[index]
+				return heapify(right)
+
+
+		def sort():
+			output = []
+			while len(self.array) > 0:
+				for i in range(len(self.array) // 2, -1, -1):
+					heapify(i)
+				output.append(self.array[0])
+				self.array = self.array[1:]
+			return output
+
+		self.array = sort()
+		self.time_taken = time.time() - start
+
+
 # Driver code
 lst = []
-for i in range(1000):
+for i in range(2000):
 	lst.append(random.randint(1, 100))
 sorted_obj = Sorts(lst)
 sorted_obj.quick_sort()
