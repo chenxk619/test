@@ -61,7 +61,7 @@ def find(start, end, visited, unvisited, node_path, barricades):
 
 				#To not add the same node it is currently at and to avoid the node from going out of bounds and prevent
 				#if from colliding with the barricades
-				if i != 0 or j != 0 and start.node_pos[0] + i >= 0  and start.node_pos[0] + i < Board.y_length \
+				if abs(i + j) == 1 and start.node_pos[0] + i >= 0  and start.node_pos[0] + i < Board.y_length \
 						and start.node_pos[1] + j >= 0 and start.node_pos[1] + j < Board.x_length and \
 						[start.node_pos[0] + i,start.node_pos[1] + j] not in barricades:
 					#If the end is found (next to the start)
@@ -92,7 +92,7 @@ def find(start, end, visited, unvisited, node_path, barricades):
 				if stop == True:
 					break
 
-				if (i != 0 or j != 0) and cur_node.node_pos[0] + i >= 0 and cur_node.node_pos[1] + j >= 0 and \
+				if abs(i + j) == 1 and cur_node.node_pos[0] + i >= 0 and cur_node.node_pos[1] + j >= 0 and \
 						cur_node.node_pos[0] + i < Board.y_length and cur_node.node_pos[1] + j < Board.y_length and \
 						[cur_node.node_pos[0] + i,cur_node.node_pos[1] + j] not in barricades:
 
