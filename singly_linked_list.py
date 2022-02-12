@@ -143,35 +143,26 @@ class Linked_list:
 			return None
 		return self.tail.val
 
-	# Good luck understanding this
-	# For all cases, set up primary (pri), secondary (sec) pointers, which points to head and head.next
-	# For the 0,1,2 nodes, return empty list, return same node and reverse the 2 nodes respectively.
-	# Otherwise, set an additional pointer named tertiary(ter), pointing to sec.next.  While ter pointer isn't None, link sec.next to pri, and shift all the pointers down the list by 1 spot using a tuple assignment. Finally, point sec to pri and reset the head pointer.
+	#reverse the linked list using a stack then use add to add from the tail
 	def reverse(self):
-		pri_node = self.head
-		sec_node = pri_node.next_node
-		if pri_node is None:
-			print('Cannot reverse(empty list)')
-		elif sec_node is None:
-			return
-		elif sec_node.next_node is None:
-			sec_node.next_node = pri_node
-			pri_node.next_node = None
-			self.head, self.tail = sec_node, pri_node
-		else:
-			self.tail = pri_node
-			pri_node.next_node = None
-			ter_node = sec_node.next_node
-			while ter_node is not None:
-				sec_node.next_node = pri_node
+		cur = self.head
+		if cur is None:
+			print("No elements to reverse")
 
-				pri_node, sec_node, ter_node = sec_node, ter_node, ter_node.next_node
+		stack = []
+		while cur.next_node is not None:
+			stack = [cur.val] + stack
+			cur = cur.next_node
 
-			sec_node.next_node = pri_node
-			self.head = sec_node
+		self.head = cur
+		for i in stack:
+			self.push_back(i)
+
 
 #Driver code will be below
 llist = Linked_list()
-llist.push_back(1)
-llist.push_front(0)
+lst = [1,2,3,4]
+for i in lst:
+	llist.push_back(i)
+llist.reverse()
 print(llist)

@@ -209,10 +209,9 @@ class Binary_tree:
 
 
 b_tree = Binary_tree()
-lst = [10, 5, 15, 2, 7, 12, 18]
+lst = [1,3,5,0]
 for i in lst:
 	b_tree.insert(i)
-b_tree.show()
 # print(b_tree.get_max(b_tree.base.right.left))
-b_tree.invert()
+#b_tree.invert()
 b_tree.show()

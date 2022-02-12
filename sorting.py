@@ -162,4 +162,4 @@ for i in range(2000):
 sorted_obj = Sorts(lst)
 sorted_obj.quick_sort()
 #optional input to show the actual array
-sorted_obj.show()
+sorted_obj.show(1)
