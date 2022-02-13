@@ -85,7 +85,7 @@ def game(board, screen, chess_dic):
     pressed = False
     #ensure only one piece is being selected
     selected_piece = None
-    temp_move = None
+    temp_pos = None
 
     while start:
 
@@ -123,8 +123,7 @@ def game(board, screen, chess_dic):
             #Selecting a piece if not already done
             #Temporarily setting id to 0; reset to original id later on unless valid move is made
             if selected_piece == None:
-                temp_move = mouse_pos
-                print(temp_move)
+                temp_pos = mouse_pos
                 selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
                 board.content[mouse_pos[0]][mouse_pos[1]] = 0
 
@@ -139,10 +138,14 @@ def game(board, screen, chess_dic):
             #assume valid move made
             #if check_valid():
 
-            board.content[temp_move[0]][temp_move[1]] = selected_piece
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
+            #temp solution
+            if board.content[mouse_pos[0]][mouse_pos[1]] == 0:
+                board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
+            else:
+                board.content[temp_pos[0]][temp_pos[1]] = selected_piece
             #has to be here to use the piece's id
             selected_piece = None
 
