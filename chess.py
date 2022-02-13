@@ -81,6 +81,12 @@ def game(board, screen, chess_dic):
 
     start = True
 
+    #check if mouse is pressed
+    pressed = False
+    #ensure only one piece is being selected
+    selected_piece = None
+    temp_move = None
+
     while start:
 
         for event in pygame.event.get():
@@ -107,16 +113,38 @@ def game(board, screen, chess_dic):
                 if chess_piece != 0:
                     screen.blit(chess_dic[chess_piece].sprite, (board.space * i,board.space * j))
 
-        #Makes a move
+        #m1 is clicked
         if pygame.mouse.get_pressed()[0]:
+            pressed = True
+
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
-            selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
-            if selected_piece != 0:
-                screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
-            print(selected_piece)
+            #Selecting a piece if not already done
+            #Temporarily setting id to 0; reset to original id later on unless valid move is made
+            if selected_piece == None:
+                temp_move = mouse_pos
+                print(temp_move)
+                selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
+                board.content[mouse_pos[0]][mouse_pos[1]] = 0
 
+            else:
+                if selected_piece != 0:
+                    screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
+
+        #m1 is released
+        if not pygame.mouse.get_pressed()[0] and pressed == True:
+            pressed = False
+
+            #assume valid move made
+            #if check_valid():
+
+            board.content[temp_move[0]][temp_move[1]] = selected_piece
+            exact_mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
+
+            #has to be here to use the piece's id
+            selected_piece = None
 
         pygame.display.update()
 
@@ -127,7 +155,6 @@ def main():
     pygame.display.set_caption('Chess')
     screen = pygame.display.set_mode((board.length, board.length))
     chess_dic = load(board)
-    print(board.content)
     game(board, screen, chess_dic)
 
 while __name__ == '__main__':
