@@ -109,10 +109,14 @@ def game(board, screen, chess_dic):
 
         #Makes a move
         if pygame.mouse.get_pressed()[0]:
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_pos = [math.floor(mouse_pos[0] / board.space), math.floor(mouse_pos[1] / board.space)]
-            if board.content[mouse_pos[0], mouse_pos[1]] != 0:
-                print(board.content[mouse_pos[0], mouse_pos[1]])
+            exact_mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
+
+            selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
+            if selected_piece != 0:
+                screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
+            print(selected_piece)
+
 
         pygame.display.update()
 
