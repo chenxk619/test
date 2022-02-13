@@ -1,6 +1,7 @@
 import pygame
 import sys
 import numpy
+import math
 
 #General board idea :
 #
@@ -44,35 +45,35 @@ def load(board):
     black_king = Pieces("black_king", -6, 1)
     white_king = Pieces("white_king", 6, 1)
 
-    chess_dic = {-1: black_pawn, 1: white_pawn, -2: black_rook, 2: white_rook, -3: black_bishop, 3: white_bishop,
+    chess_dic = {0: None, -1: black_pawn, 1: white_pawn, -2: black_rook, 2: white_rook, -3: black_bishop, 3: white_bishop,
                  -4: black_knight, 4: white_knight, -5: black_queen, 5: white_queen,
                  -6: black_king, 6: white_king}
 
     #Load in pieces
     for i in range(board.const):
-        board.content[1][i] = black_pawn.id
-        board.content[6][i] = white_pawn.id
+        board.content[i][1] = black_pawn.id
+        board.content[i][6] = white_pawn.id
 
     for i in range(0, 8, 7):
         if i == 0:
-            board.content[i][0] = black_rook.id
-            board.content[i][7] = black_rook.id
-            board.content[i][1] = black_knight.id
-            board.content[i][6] = black_knight.id
-            board.content[i][2] = black_bishop.id
-            board.content[i][5] = black_bishop.id
-            board.content[i][3] = black_queen.id
-            board.content[i][4] = black_king.id
+            board.content[0][i] = black_rook.id
+            board.content[7][i] = black_rook.id
+            board.content[1][i] = black_knight.id
+            board.content[6][i] = black_knight.id
+            board.content[2][i] = black_bishop.id
+            board.content[5][i] = black_bishop.id
+            board.content[3][i] = black_queen.id
+            board.content[4][i] = black_king.id
 
         else:
-            board.content[i][0] = white_rook.id
-            board.content[i][7] = white_rook.id
-            board.content[i][1] = white_knight.id
-            board.content[i][6] = white_knight.id
-            board.content[i][2] = white_bishop.id
-            board.content[i][5] = white_bishop.id
-            board.content[i][3] = white_queen.id
-            board.content[i][4] = white_king.id
+            board.content[0][i] = white_rook.id
+            board.content[7][i] = white_rook.id
+            board.content[1][i] = white_knight.id
+            board.content[6][i] = white_knight.id
+            board.content[2][i] = white_bishop.id
+            board.content[5][i] = white_bishop.id
+            board.content[3][i] = white_queen.id
+            board.content[4][i] = white_king.id
 
     return chess_dic
 
@@ -99,8 +100,20 @@ def game(board, screen, chess_dic):
                                      , (board.space) , (board.space)))
 
 
-        bp = -1
-        screen.blit(chess_dic[bp].sprite, (0,0))
+        for i in range(board.const):
+            for j in range(board.const):
+
+                chess_piece = board.content[i][j]
+                if chess_piece != 0:
+                    screen.blit(chess_dic[chess_piece].sprite, (board.space * i,board.space * j))
+
+        #Makes a move
+        if pygame.mouse.get_pressed()[0]:
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = [math.floor(mouse_pos[0] / board.space), math.floor(mouse_pos[1] / board.space)]
+            if board.content[mouse_pos[0], mouse_pos[1]] != 0:
+                print(board.content[mouse_pos[0], mouse_pos[1]])
+
         pygame.display.update()
 
 def main():
