@@ -24,11 +24,13 @@ class Board:
         self.space = self.length / self.const
         self.content = numpy.zeros((self.const, self.const))
 
+#Moved to check for castling and pawn moves
 class Pieces:
     def __init__(self, sprite, id, value):
         self.sprite = pygame.transform.scale(pygame.image.load("chess_folder/" + sprite + ".png") , (94,94))
         self.id = id
         self.value = value
+        self.moved = False
 
 def load(board):
 
@@ -62,7 +64,7 @@ def load(board):
             board.content[6][i] = black_knight.id
             board.content[2][i] = black_bishop.id
             board.content[5][i] = black_bishop.id
-            board.content[3][i] = black_queen.id
+            #board.content[3][i] = black_queen.id
             board.content[4][i] = black_king.id
 
         else:
@@ -76,6 +78,59 @@ def load(board):
             board.content[4][i] = white_king.id
 
     return chess_dic
+
+# Pawn chess pieces can only directly forward one square, with two exceptions.
+# Pawns can move directly forward two squares on their first move only.
+# Pawns can move diagonally forward when capturing an opponent's chess piece.
+# Once a pawn chess piece reaches the other side of the chess board, the player may "trade" the pawn in for any other chess
+# piece if they choose, except another king.
+
+
+#Rest is ez
+
+#Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
+#question has moved
+
+
+def move_set(board, selected_piece, mouse_pos, temp_pos):
+    eat = False
+
+    #Can't eat own piece, multiplication of two pieces id must be negative or 0
+    if selected_piece * board.content[mouse_pos[0]][mouse_pos[1]] < 0:
+        eat = True
+
+    #Pawns
+    if abs(selected_piece) == 1:
+        if eat == False:
+            if temp_pos[0] - mouse_pos[0] == 0:
+                if selected_piece == 1:
+                    if temp_pos[1] == 6:
+                        if temp_pos[1] - mouse_pos[1] == 1 or temp_pos[1] - mouse_pos[1] == 2:
+                            return True
+                    else:
+                        if temp_pos[1] - mouse_pos[1] == 1:
+                            return True
+
+
+                if selected_piece == -1:
+                    if temp_pos[1] == 1:
+                        if temp_pos[1] - mouse_pos[1] == -1 or temp_pos[1] - mouse_pos[1] == -2:
+                            return True
+                    else:
+                        if temp_pos[1] - mouse_pos[1] == -1:
+                            return True
+
+        if eat == True:
+            if selected_piece == 1:
+                if abs(temp_pos[0] - mouse_pos[0]) == 1 and temp_pos[1] - mouse_pos[1] == 1:
+                    return True
+            if selected_piece == -1:
+                if abs(temp_pos[0] - mouse_pos[0]) == 1 and temp_pos[1] - mouse_pos[1] == -1:
+                    return True
+
+
+    return False
+
 
 def game(board, screen, chess_dic):
 
@@ -135,17 +190,19 @@ def game(board, screen, chess_dic):
         if not pygame.mouse.get_pressed()[0] and pressed == True:
             pressed = False
 
-            #assume valid move made
-            #if check_valid():
-
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
             #temp solution
-            if board.content[mouse_pos[0]][mouse_pos[1]] == 0:
+            if move_set(board, selected_piece, mouse_pos, temp_pos):
+                if selected_piece == 1 and mouse_pos[1] == 0:
+                    selected_piece = 5
+                if selected_piece == -1 and mouse_pos[1] == board.const - 1:
+                    selected_piece = -5
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
+
             #has to be here to use the piece's id
             selected_piece = None
 
