@@ -98,6 +98,12 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
     #Can't eat own piece, multiplication of two pieces id must be negative or 0
     if selected_piece * board.content[mouse_pos[0]][mouse_pos[1]] < 0:
         eat = True
+    elif selected_piece * board.content[mouse_pos[0]][mouse_pos[1]] == 0:
+        eat = False
+    else:
+        return False
+
+    #Prevent own pieces being taken
 
     #Pawns
     if abs(selected_piece) == 1:
@@ -105,7 +111,9 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
             if temp_pos[0] - mouse_pos[0] == 0:
                 if selected_piece == 1:
                     if temp_pos[1] == 6:
-                        if temp_pos[1] - mouse_pos[1] == 1 or temp_pos[1] - mouse_pos[1] == 2:
+                        if temp_pos[1] - mouse_pos[1] == 1:
+                            return True
+                        elif temp_pos[1] - mouse_pos[1] == 2 and board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
                             return True
                     else:
                         if temp_pos[1] - mouse_pos[1] == 1:
@@ -114,7 +122,9 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
 
                 if selected_piece == -1:
                     if temp_pos[1] == 1:
-                        if temp_pos[1] - mouse_pos[1] == -1 or temp_pos[1] - mouse_pos[1] == -2:
+                        if temp_pos[1] - mouse_pos[1] == -1:
+                            return True
+                        elif temp_pos[1] - mouse_pos[1] == -2 and board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
                             return True
                     else:
                         if temp_pos[1] - mouse_pos[1] == -1:
@@ -128,6 +138,85 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
                 if abs(temp_pos[0] - mouse_pos[0]) == 1 and temp_pos[1] - mouse_pos[1] == -1:
                     return True
 
+    #Rook
+    if abs(selected_piece) == 2:
+        #Horizontal
+        if temp_pos[1] - mouse_pos[1] == 0:
+            diff = mouse_pos[0] - temp_pos[0]
+            #move right
+            if diff > 0:
+                for i in range(diff):
+                    if board.content[temp_pos[0] + i][temp_pos[1]] != 0:
+                        return False
+
+            if diff < 0:
+                for i in range(-diff):
+                    if board.content[temp_pos[0] - i][temp_pos[1]] != 0:
+                        return False
+
+            return True
+
+        # Vertical
+        if temp_pos[0] - mouse_pos[0] == 0:
+            diff = mouse_pos[1] - temp_pos[1]
+            # move right
+            if diff > 0:
+                for i in range(diff):
+                    if board.content[temp_pos[0]][temp_pos[1] + i] != 0:
+                        return False
+
+            if diff < 0:
+                for i in range(-diff):
+                    if board.content[temp_pos[0]][temp_pos[1]- i] != 0:
+                        return False
+
+            return True
+
+    #Bishop
+    if abs(selected_piece) == 3:
+        vdiff = mouse_pos[1] - temp_pos[1]
+        hdiff = mouse_pos[0] - temp_pos[0]
+
+        if abs(vdiff) - abs(hdiff) != 0:
+            return False
+        if vdiff < 0:
+            if hdiff < 0:
+                for i in range(-vdiff):
+                    if board.content[temp_pos[0] - i][temp_pos[1] - i] != 0:
+                        return False
+
+            if hdiff > 0:
+                for i in range(-vdiff):
+                    if board.content[temp_pos[0] + i][temp_pos[1] - i] != 0:
+                        return False
+
+            return True
+
+        if vdiff > 0:
+            if hdiff < 0:
+                for i in range(vdiff):
+                    if board.content[temp_pos[0] - i][temp_pos[1] + i] != 0:
+                        return False
+
+            if hdiff > 0:
+                for i in range(vdiff):
+                    if board.content[temp_pos[0] + i][temp_pos[1] + i] != 0:
+                        return False
+
+            return True
+
+    #Knight
+    if abs(selected_piece) == 4:
+        if abs(mouse_pos[0] - temp_pos[0]) == 1 and abs(mouse_pos[1] - temp_pos[1]) == 2 or abs(mouse_pos[0] - temp_pos[0]) == 2 and abs(mouse_pos[1] - temp_pos[1]) == 1:
+            return True
+
+    #Queen
+    if abs(selected_piece) == 5:
+        vdiff = mouse_pos[1] - temp_pos[1]
+        hdiff = mouse_pos[0] - temp_pos[0]
+
+        if vdiff == 0 or hdiff == 0:
+            pass
 
     return False
 
@@ -193,13 +282,16 @@ def game(board, screen, chess_dic):
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
-            #temp solution
             if move_set(board, selected_piece, mouse_pos, temp_pos):
+
+                #Check for pawn promotion
                 if selected_piece == 1 and mouse_pos[1] == 0:
                     selected_piece = 5
                 if selected_piece == -1 and mouse_pos[1] == board.const - 1:
                     selected_piece = -5
+
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
+
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
 
