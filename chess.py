@@ -22,6 +22,9 @@ class Board:
         self.const = 8
         self.length = 750
         self.space = self.length / self.const
+        self.light_green = (235, 245, 208)
+        self.dark_green = (23, 153, 58)
+        self.light_red = (222, 133, 146)
         self.content = numpy.zeros((self.const, self.const))
 
 #Moved to check for castling and pawn moves
@@ -91,6 +94,77 @@ def load(board):
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
+def move_block_check(straights, diagonals, maximum_range, temp_pos, mouse_pos, board):
+
+    hdiff = mouse_pos[0] - temp_pos[0]
+    vdiff = mouse_pos[1] - temp_pos[1]
+
+    if maximum_range:
+        if abs(hdiff) > 1 or abs(vdiff) > 1:
+            return False
+
+    if straights:
+
+        #horizontal
+        if temp_pos[1] - mouse_pos[1] == 0:
+            # move right
+            if hdiff > 0:
+                for i in range(hdiff):
+                    if board.content[temp_pos[0] + i][temp_pos[1]] != 0:
+                        return False
+
+            if hdiff < 0:
+                for i in range(-hdiff):
+                    if board.content[temp_pos[0] - i][temp_pos[1]] != 0:
+                        return False
+
+            return True
+
+        # Vertical
+        if temp_pos[0] - mouse_pos[0] == 0:
+            # move right
+            if vdiff > 0:
+                for i in range(vdiff):
+                    if board.content[temp_pos[0]][temp_pos[1] + i] != 0:
+                        return False
+
+            if vdiff < 0:
+                for i in range(-vdiff):
+                    if board.content[temp_pos[0]][temp_pos[1] - i] != 0:
+                        return False
+
+            return True
+
+
+    if diagonals:
+        if abs(vdiff) - abs(hdiff) != 0:
+            return False
+        if vdiff < 0:
+            if hdiff < 0:
+                for i in range(-vdiff):
+                    if board.content[temp_pos[0] - i][temp_pos[1] - i] != 0:
+                        return False
+
+            if hdiff > 0:
+                for i in range(-vdiff):
+                    if board.content[temp_pos[0] + i][temp_pos[1] - i] != 0:
+                        return False
+
+            return True
+
+        if vdiff > 0:
+            if hdiff < 0:
+                for i in range(vdiff):
+                    if board.content[temp_pos[0] - i][temp_pos[1] + i] != 0:
+                        return False
+
+            if hdiff > 0:
+                for i in range(vdiff):
+                    if board.content[temp_pos[0] + i][temp_pos[1] + i] != 0:
+                        return False
+
+            return True
+
 
 def move_set(board, selected_piece, mouse_pos, temp_pos):
     eat = False
@@ -102,8 +176,6 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
         eat = False
     else:
         return False
-
-    #Prevent own pieces being taken
 
     #Pawns
     if abs(selected_piece) == 1:
@@ -140,70 +212,11 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
 
     #Rook
     if abs(selected_piece) == 2:
-        #Horizontal
-        if temp_pos[1] - mouse_pos[1] == 0:
-            diff = mouse_pos[0] - temp_pos[0]
-            #move right
-            if diff > 0:
-                for i in range(diff):
-                    if board.content[temp_pos[0] + i][temp_pos[1]] != 0:
-                        return False
-
-            if diff < 0:
-                for i in range(-diff):
-                    if board.content[temp_pos[0] - i][temp_pos[1]] != 0:
-                        return False
-
-            return True
-
-        # Vertical
-        if temp_pos[0] - mouse_pos[0] == 0:
-            diff = mouse_pos[1] - temp_pos[1]
-            # move right
-            if diff > 0:
-                for i in range(diff):
-                    if board.content[temp_pos[0]][temp_pos[1] + i] != 0:
-                        return False
-
-            if diff < 0:
-                for i in range(-diff):
-                    if board.content[temp_pos[0]][temp_pos[1]- i] != 0:
-                        return False
-
-            return True
+        return move_block_check(True, False, False, temp_pos, mouse_pos, board)
 
     #Bishop
     if abs(selected_piece) == 3:
-        vdiff = mouse_pos[1] - temp_pos[1]
-        hdiff = mouse_pos[0] - temp_pos[0]
-
-        if abs(vdiff) - abs(hdiff) != 0:
-            return False
-        if vdiff < 0:
-            if hdiff < 0:
-                for i in range(-vdiff):
-                    if board.content[temp_pos[0] - i][temp_pos[1] - i] != 0:
-                        return False
-
-            if hdiff > 0:
-                for i in range(-vdiff):
-                    if board.content[temp_pos[0] + i][temp_pos[1] - i] != 0:
-                        return False
-
-            return True
-
-        if vdiff > 0:
-            if hdiff < 0:
-                for i in range(vdiff):
-                    if board.content[temp_pos[0] - i][temp_pos[1] + i] != 0:
-                        return False
-
-            if hdiff > 0:
-                for i in range(vdiff):
-                    if board.content[temp_pos[0] + i][temp_pos[1] + i] != 0:
-                        return False
-
-            return True
+        return move_block_check(False, True, False, temp_pos, mouse_pos, board)
 
     #Knight
     if abs(selected_piece) == 4:
@@ -212,11 +225,11 @@ def move_set(board, selected_piece, mouse_pos, temp_pos):
 
     #Queen
     if abs(selected_piece) == 5:
-        vdiff = mouse_pos[1] - temp_pos[1]
-        hdiff = mouse_pos[0] - temp_pos[0]
+        return move_block_check(True, True, False, temp_pos, mouse_pos, board)
 
-        if vdiff == 0 or hdiff == 0:
-            pass
+    #King
+    if abs(selected_piece) == 6:
+        return move_block_check(True, True, True, temp_pos, mouse_pos, board)
 
     return False
 
@@ -242,11 +255,11 @@ def game(board, screen, chess_dic):
         for rows in range(board.const):
             for columns in range(board.const):
                 if (rows + columns) % 2 == 0:
-                    pygame.draw.rect(screen, (235, 245, 208), ((board.space * rows) , (board.space * columns)
+                    pygame.draw.rect(screen, board.light_green, ((board.space * rows) , (board.space * columns)
                                      , (board.space) , (board.space)))
 
                 if (rows + columns) % 2 == 1:
-                    pygame.draw.rect(screen, (23, 153, 58), ((board.space * rows) , (board.space * columns)
+                    pygame.draw.rect(screen, board.dark_green, ((board.space * rows) , (board.space * columns)
                                      , (board.space) , (board.space)))
 
 
@@ -281,6 +294,11 @@ def game(board, screen, chess_dic):
 
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
+
+            #Available moves
+            # for moves in move_lst:
+            #     pygame.draw.rect(screen, board.light_red, ((board.space * moves[0]), (board.space * moves[1])
+            #                                          , (board.space), (board.space)))
 
             if move_set(board, selected_piece, mouse_pos, temp_pos):
 
