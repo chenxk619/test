@@ -94,6 +94,25 @@ def load(board):
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
+def show_moves(temp_pos, selected_pieces, board):
+    move_lst = []
+
+    #Knight
+    if abs(selected_pieces) == 4:
+        print([[temp_pos[0] - 2][temp_pos[1] - 1]])
+        lst =      [[[temp_pos[0] + 1][temp_pos[1] + 2]], [[temp_pos[0] + 1][temp_pos[1] - 2]],
+                        [[temp_pos[0] + 2][temp_pos[1] + 1]], [[temp_pos[0] + 2][temp_pos[1] - 1]],
+                        [[temp_pos[0] - 1][temp_pos[1] + 2]], [[temp_pos[0] - 1][temp_pos[1] - 2]],
+                        [[temp_pos[0] - 2][temp_pos[1] + 1]], [[temp_pos[0] - 2][temp_pos[1] - 1]]]
+
+        for i in lst:
+            if i[0] < 0 or i[0] > 7 or i[1] < 0 or i[1] > 7:
+                lst.remove(i)
+
+        move_lst = lst
+
+    return move_lst
+
 def move_block_check(straights, diagonals, maximum_range, temp_pos, mouse_pos, board):
 
     hdiff = mouse_pos[0] - temp_pos[0]
@@ -288,6 +307,13 @@ def game(board, screen, chess_dic):
                 if selected_piece != 0:
                     screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
 
+            #To show the available moves
+            move_lst = show_moves(temp_pos, selected_piece, board)
+
+            for moves in move_lst:
+                pygame.draw.rect(screen, board.light_red, ((board.space * moves[0]), (board.space * moves[1])
+                                                     , (board.space), (board.space)))
+
         #m1 is released
         if not pygame.mouse.get_pressed()[0] and pressed == True:
             pressed = False
@@ -295,10 +321,6 @@ def game(board, screen, chess_dic):
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
-            #Available moves
-            # for moves in move_lst:
-            #     pygame.draw.rect(screen, board.light_red, ((board.space * moves[0]), (board.space * moves[1])
-            #                                          , (board.space), (board.space)))
 
             if move_set(board, selected_piece, mouse_pos, temp_pos):
 
