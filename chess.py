@@ -99,11 +99,11 @@ def show_moves(temp_pos, selected_pieces, board):
 
     #Knight
     if abs(selected_pieces) == 4:
-        print([[temp_pos[0] - 2][temp_pos[1] - 1]])
-        lst =      [[[temp_pos[0] + 1][temp_pos[1] + 2]], [[temp_pos[0] + 1][temp_pos[1] - 2]],
-                        [[temp_pos[0] + 2][temp_pos[1] + 1]], [[temp_pos[0] + 2][temp_pos[1] - 1]],
-                        [[temp_pos[0] - 1][temp_pos[1] + 2]], [[temp_pos[0] - 1][temp_pos[1] - 2]],
-                        [[temp_pos[0] - 2][temp_pos[1] + 1]], [[temp_pos[0] - 2][temp_pos[1] - 1]]]
+        print([[temp_pos[0] - 2],[temp_pos[1] - 1]])
+        lst =      [[temp_pos[0] + 1,temp_pos[1] + 2], [temp_pos[0] + 1,temp_pos[1] - 2],
+                        [temp_pos[0] + 2,temp_pos[1] + 1], [temp_pos[0] + 2,temp_pos[1] - 1],
+                        [temp_pos[0] - 1,temp_pos[1] + 2], [temp_pos[0] - 1,temp_pos[1] - 2],
+                        [temp_pos[0] - 2,temp_pos[1] + 1], [temp_pos[0] - 2,temp_pos[1] - 1]]
 
         for i in lst:
             if i[0] < 0 or i[0] > 7 or i[1] < 0 or i[1] > 7:
