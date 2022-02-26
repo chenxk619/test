@@ -19,6 +19,8 @@ import math
 
 class Board:
     def __init__(self):
+        self.check = 0
+        self.turn = 1
         self.const = 8
         self.length = 750
         self.space = self.length / self.const
@@ -318,9 +320,12 @@ def game(board, screen, chess_dic):
             if selected_piece == None:
                 temp_pos = mouse_pos
                 selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
-                board.content[mouse_pos[0]][mouse_pos[1]] = 0
+                if selected_piece * board.turn > 0:
+                    #Not check or check but using king
+                    if board.turn != board.check or board.turn == board.check and abs(selected_piece) == 6:
+                        board.content[mouse_pos[0]][mouse_pos[1]] = 0
 
-            else:
+            elif (selected_piece * board.turn > 0):
 
                 #To show the available moves
                 move_lst = show_moves(temp_pos, selected_piece, board)
@@ -343,6 +348,8 @@ def game(board, screen, chess_dic):
                 if selected_piece != 0:
                     screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
 
+            else:
+                move_lst = []
 
 
         #m1 is released
@@ -353,7 +360,7 @@ def game(board, screen, chess_dic):
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
 
-            if mouse_pos in move_lst:
+            if mouse_pos in move_lst and board.turn * selected_piece > 0:
 
                 #Check for pawn promotion
                 if selected_piece == 1 and mouse_pos[1] == 0:
@@ -362,13 +369,21 @@ def game(board, screen, chess_dic):
                     selected_piece = -5
 
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
+                #Check for check
+                move_lst = show_moves(mouse_pos, selected_piece, board)
+                for i in move_lst:
+                    if board.content[i[0]][i[1]] == board.turn * -6:
+                        print("check")
+                        board.check = -board.turn
 
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
+                board.turn *= - 1
 
             #has to be here to use the piece's id
             selected_piece = None
             move_lst = None
+            board.turn *= -1
 
         pygame.display.update()
 
