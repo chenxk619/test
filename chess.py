@@ -24,7 +24,7 @@ class Board:
         self.space = self.length / self.const
         self.light_green = (235, 245, 208)
         self.dark_green = (23, 153, 58)
-        self.light_red = (222, 133, 146)
+        self.pos_color = (237, 247, 49, 200)
         self.content = numpy.zeros((self.const, self.const))
 
 #Moved to check for castling and pawn moves
@@ -67,7 +67,7 @@ def load(board):
             board.content[6][i] = black_knight.id
             board.content[2][i] = black_bishop.id
             board.content[5][i] = black_bishop.id
-            #board.content[3][i] = black_queen.id
+            board.content[3][i] = black_queen.id
             board.content[4][i] = black_king.id
 
         else:
@@ -94,163 +94,180 @@ def load(board):
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
+def show_moves_check(straights, diagonals, single_move, temp_pos, selected_pieces, board):
+    move_lst = []
+
+    if single_move:
+        jump = 7
+    else:
+        jump = 1
+
+    if straights:
+        for i in range(1, 8, jump):
+            if temp_pos[0] + i <= 7:
+                if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1]] <= 0:
+                    move_lst.append([temp_pos[0] + i, temp_pos[1]])
+                    if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1]] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[1] + i <= 7:
+                if selected_pieces * board.content[temp_pos[0]][temp_pos[1] + i] <= 0:
+                    move_lst.append([temp_pos[0], temp_pos[1] + i])
+                    if selected_pieces * board.content[temp_pos[0]][temp_pos[1] + i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[0] - i >= 0:
+                if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1]] <= 0:
+                    move_lst.append([temp_pos[0] - i, temp_pos[1]])
+                    if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1]] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[1] - i >= 0:
+                if selected_pieces * board.content[temp_pos[0]][temp_pos[1] - i] <= 0:
+                    move_lst.append([temp_pos[0], temp_pos[1] - i])
+                    if selected_pieces * board.content[temp_pos[0]][temp_pos[1] - i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+    if diagonals:
+        for i in range(1, 8, jump):
+            if temp_pos[0] + i <= 7 and temp_pos[1] + i <= 7:
+                if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1] + i] <= 0:
+                    move_lst.append([temp_pos[0] + i, temp_pos[1] + i])
+                    if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1] + i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[0] + i <= 7 and temp_pos[1] - i >= 0:
+                if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1] - i] <= 0:
+                    move_lst.append([temp_pos[0] + i, temp_pos[1] - i])
+                    if selected_pieces * board.content[temp_pos[0] + i][temp_pos[1] - i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[0] - i >= 0 and temp_pos[1] + i <= 7:
+                if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1] + i] <= 0:
+                    move_lst.append([temp_pos[0] - i, temp_pos[1] + i])
+                    if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1] + i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+        for i in range(1, 8, jump):
+            if temp_pos[0] - i >= 0 and temp_pos[1] - i >= 0:
+                if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1] - i] <= 0:
+                    move_lst.append([temp_pos[0] - i, temp_pos[1] - i])
+                    if selected_pieces * board.content[temp_pos[0] - i][temp_pos[1] - i] < 0:
+                        break
+                else:
+                    break
+            else:
+                break
+
+    return move_lst
+
 def show_moves(temp_pos, selected_pieces, board):
     move_lst = []
+    #Pawn
+    if abs(selected_pieces) == 1:
+        if selected_pieces == 1:
+
+            if board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
+                move_lst.append([temp_pos[0], temp_pos[1] - 1])
+
+                if board.content[temp_pos[0]][temp_pos[1] - 2] == 0 and temp_pos[1] == 6:
+                    move_lst.append([temp_pos[0], temp_pos[1] - 2])
+
+
+            if temp_pos[0] - 1 >= 0:
+                if selected_pieces * board.content[temp_pos[0] - 1][temp_pos[1] - 1] < 0:
+                    move_lst.append([temp_pos[0] - 1, temp_pos[1] - 1])
+            if temp_pos[0] + 1 <= 7:
+                if selected_pieces * board.content[temp_pos[0] + 1][temp_pos[1] - 1] < 0:
+                    move_lst.append([temp_pos[0] + 1, temp_pos[1] - 1])
+
+
+        if selected_pieces == -1:
+            if board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
+                move_lst.append([temp_pos[0], temp_pos[1] + 1])
+
+                if board.content[temp_pos[0]][temp_pos[1] + 2] == 0 and temp_pos[1] == 1:
+                    move_lst.append([temp_pos[0], temp_pos[1] + 2])
+
+            if temp_pos[0] - 1 >= 0:
+                if selected_pieces * board.content[temp_pos[0] - 1][temp_pos[1] + 1] < 0:
+                    move_lst.append([temp_pos[0] - 1, temp_pos[1] + 1])
+            if temp_pos[0] + 1 <= 7:
+                if selected_pieces * board.content[temp_pos[0] + 1][temp_pos[1] + 1] < 0:
+                    move_lst.append([temp_pos[0] + 1, temp_pos[1] + 1])
+
+
+
+        # if temp_pos[0] + 1 <= 7 and temp_pos[1] + 1 <= 7 and selected_pieces * board.content[temp_pos[0] + 1][temp_pos[1] + 1] < 0:
+        #     print(board.content[temp_pos[0] + 1][temp_pos[1] + 1])
+        #     move_lst.append([temp_pos[0] + 1, temp_pos[1] + 1])
+
+        # if temp_pos[0] - 1 >= 0  and temp_pos[1] - 1 >= 0 and selected_pieces * board.content[temp_pos[0] - 1][temp_pos[1] - 1] < 0:
+        #     move_lst.append([temp_pos[0] - 1, temp_pos[1] - 1])
+
+    #Rook
+    if abs(selected_pieces) == 2:
+        move_lst = show_moves_check(True, False, False, temp_pos, selected_pieces, board)
+
+    #Bishop
+    if abs(selected_pieces) == 3:
+        move_lst = show_moves_check(False, True, False, temp_pos, selected_pieces, board)
 
     #Knight
     if abs(selected_pieces) == 4:
-        print([[temp_pos[0] - 2],[temp_pos[1] - 1]])
+
         lst =      [[temp_pos[0] + 1,temp_pos[1] + 2], [temp_pos[0] + 1,temp_pos[1] - 2],
                         [temp_pos[0] + 2,temp_pos[1] + 1], [temp_pos[0] + 2,temp_pos[1] - 1],
                         [temp_pos[0] - 1,temp_pos[1] + 2], [temp_pos[0] - 1,temp_pos[1] - 2],
                         [temp_pos[0] - 2,temp_pos[1] + 1], [temp_pos[0] - 2,temp_pos[1] - 1]]
 
         for i in lst:
-            if i[0] < 0 or i[0] > 7 or i[1] < 0 or i[1] > 7:
-                lst.remove(i)
 
-        move_lst = lst
-
-    return move_lst
-
-def move_block_check(straights, diagonals, maximum_range, temp_pos, mouse_pos, board):
-
-    hdiff = mouse_pos[0] - temp_pos[0]
-    vdiff = mouse_pos[1] - temp_pos[1]
-
-    if maximum_range:
-        if abs(hdiff) > 1 or abs(vdiff) > 1:
-            return False
-
-    if straights:
-
-        #horizontal
-        if temp_pos[1] - mouse_pos[1] == 0:
-            # move right
-            if hdiff > 0:
-                for i in range(hdiff):
-                    if board.content[temp_pos[0] + i][temp_pos[1]] != 0:
-                        return False
-
-            if hdiff < 0:
-                for i in range(-hdiff):
-                    if board.content[temp_pos[0] - i][temp_pos[1]] != 0:
-                        return False
-
-            return True
-
-        # Vertical
-        if temp_pos[0] - mouse_pos[0] == 0:
-            # move right
-            if vdiff > 0:
-                for i in range(vdiff):
-                    if board.content[temp_pos[0]][temp_pos[1] + i] != 0:
-                        return False
-
-            if vdiff < 0:
-                for i in range(-vdiff):
-                    if board.content[temp_pos[0]][temp_pos[1] - i] != 0:
-                        return False
-
-            return True
-
-
-    if diagonals:
-        if abs(vdiff) - abs(hdiff) != 0:
-            return False
-        if vdiff < 0:
-            if hdiff < 0:
-                for i in range(-vdiff):
-                    if board.content[temp_pos[0] - i][temp_pos[1] - i] != 0:
-                        return False
-
-            if hdiff > 0:
-                for i in range(-vdiff):
-                    if board.content[temp_pos[0] + i][temp_pos[1] - i] != 0:
-                        return False
-
-            return True
-
-        if vdiff > 0:
-            if hdiff < 0:
-                for i in range(vdiff):
-                    if board.content[temp_pos[0] - i][temp_pos[1] + i] != 0:
-                        return False
-
-            if hdiff > 0:
-                for i in range(vdiff):
-                    if board.content[temp_pos[0] + i][temp_pos[1] + i] != 0:
-                        return False
-
-            return True
-
-
-def move_set(board, selected_piece, mouse_pos, temp_pos):
-    eat = False
-
-    #Can't eat own piece, multiplication of two pieces id must be negative or 0
-    if selected_piece * board.content[mouse_pos[0]][mouse_pos[1]] < 0:
-        eat = True
-    elif selected_piece * board.content[mouse_pos[0]][mouse_pos[1]] == 0:
-        eat = False
-    else:
-        return False
-
-    #Pawns
-    if abs(selected_piece) == 1:
-        if eat == False:
-            if temp_pos[0] - mouse_pos[0] == 0:
-                if selected_piece == 1:
-                    if temp_pos[1] == 6:
-                        if temp_pos[1] - mouse_pos[1] == 1:
-                            return True
-                        elif temp_pos[1] - mouse_pos[1] == 2 and board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
-                            return True
-                    else:
-                        if temp_pos[1] - mouse_pos[1] == 1:
-                            return True
-
-
-                if selected_piece == -1:
-                    if temp_pos[1] == 1:
-                        if temp_pos[1] - mouse_pos[1] == -1:
-                            return True
-                        elif temp_pos[1] - mouse_pos[1] == -2 and board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
-                            return True
-                    else:
-                        if temp_pos[1] - mouse_pos[1] == -1:
-                            return True
-
-        if eat == True:
-            if selected_piece == 1:
-                if abs(temp_pos[0] - mouse_pos[0]) == 1 and temp_pos[1] - mouse_pos[1] == 1:
-                    return True
-            if selected_piece == -1:
-                if abs(temp_pos[0] - mouse_pos[0]) == 1 and temp_pos[1] - mouse_pos[1] == -1:
-                    return True
-
-    #Rook
-    if abs(selected_piece) == 2:
-        return move_block_check(True, False, False, temp_pos, mouse_pos, board)
-
-    #Bishop
-    if abs(selected_piece) == 3:
-        return move_block_check(False, True, False, temp_pos, mouse_pos, board)
-
-    #Knight
-    if abs(selected_piece) == 4:
-        if abs(mouse_pos[0] - temp_pos[0]) == 1 and abs(mouse_pos[1] - temp_pos[1]) == 2 or abs(mouse_pos[0] - temp_pos[0]) == 2 and abs(mouse_pos[1] - temp_pos[1]) == 1:
-            return True
+            if i[0] >= 0 and i[0] <= 7 and i[1] >= 0 and i[1] <= 7 and selected_pieces * board.content[i[0]][i[1]] <= 0:
+                move_lst.append(i)
 
     #Queen
-    if abs(selected_piece) == 5:
-        return move_block_check(True, True, False, temp_pos, mouse_pos, board)
+    if abs(selected_pieces) == 5:
+        move_lst = show_moves_check(True, True, False, temp_pos, selected_pieces, board)
 
     #King
-    if abs(selected_piece) == 6:
-        return move_block_check(True, True, True, temp_pos, mouse_pos, board)
+    if abs(selected_pieces) == 6:
+        move_lst = show_moves_check(True, True, True, temp_pos, selected_pieces, board)
 
-    return False
+    return move_lst
 
 
 def game(board, screen, chess_dic):
@@ -262,6 +279,7 @@ def game(board, screen, chess_dic):
     #ensure only one piece is being selected
     selected_piece = None
     temp_pos = None
+    move_lst = []
 
     while start:
 
@@ -280,7 +298,6 @@ def game(board, screen, chess_dic):
                 if (rows + columns) % 2 == 1:
                     pygame.draw.rect(screen, board.dark_green, ((board.space * rows) , (board.space * columns)
                                      , (board.space) , (board.space)))
-
 
         for i in range(board.const):
             for j in range(board.const):
@@ -304,15 +321,29 @@ def game(board, screen, chess_dic):
                 board.content[mouse_pos[0]][mouse_pos[1]] = 0
 
             else:
+
+                #To show the available moves
+                move_lst = show_moves(temp_pos, selected_piece, board)
+
+                for moves in move_lst:
+                    #thank you guy on internet for alpha colours
+                    rect = ((board.space * moves[0]), (board.space * moves[1])
+                                                         , (board.space), (board.space))
+                    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+                    pygame.draw.rect(shape_surf, board.pos_color, shape_surf.get_rect())
+                    screen.blit(shape_surf, rect)
+
+                for i in range(board.const):
+                    for j in range(board.const):
+
+                        chess_piece = board.content[i][j]
+                        if chess_piece != 0:
+                            screen.blit(chess_dic[chess_piece].sprite, (board.space * i, board.space * j))
+
                 if selected_piece != 0:
                     screen.blit(chess_dic[selected_piece].sprite, (exact_mouse_pos[0] - board.space/2, exact_mouse_pos[1] - board.space/2))
 
-            #To show the available moves
-            move_lst = show_moves(temp_pos, selected_piece, board)
 
-            for moves in move_lst:
-                pygame.draw.rect(screen, board.light_red, ((board.space * moves[0]), (board.space * moves[1])
-                                                     , (board.space), (board.space)))
 
         #m1 is released
         if not pygame.mouse.get_pressed()[0] and pressed == True:
@@ -322,7 +353,7 @@ def game(board, screen, chess_dic):
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
 
-            if move_set(board, selected_piece, mouse_pos, temp_pos):
+            if mouse_pos in move_lst:
 
                 #Check for pawn promotion
                 if selected_piece == 1 and mouse_pos[1] == 0:
@@ -337,6 +368,7 @@ def game(board, screen, chess_dic):
 
             #has to be here to use the piece's id
             selected_piece = None
+            move_lst = None
 
         pygame.display.update()
 
