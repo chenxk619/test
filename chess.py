@@ -96,6 +96,17 @@ def load(board):
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
+def check(board, turn):
+    for i in range(board.const):
+        for j in range(board.const):
+            if board.content[i][j] * turn > 0:
+                enemy_lst = show_moves([i,j], board.content[i][j], board)
+                for k in enemy_lst:
+                    if -turn * 6 == board.content[k[0]][k[1]]:
+                        return True
+
+    return False
+
 def show_moves_check(straights, diagonals, single_move, temp_pos, selected_pieces, board):
     move_lst = []
 
@@ -318,22 +329,19 @@ def game(board, screen, chess_dic):
             #Selecting a piece if not already done
             #Temporarily setting id to 0; reset to original id later on unless valid move is made
             if selected_piece == None:
+
                 temp_pos = mouse_pos
                 selected_piece = board.content[mouse_pos[0]][mouse_pos[1]]
                 if selected_piece * board.turn > 0:
-                    #Not check or check but using king
-                    if board.turn != board.check or board.turn == board.check and abs(selected_piece) == 6:
-                        board.content[mouse_pos[0]][mouse_pos[1]] = 0
+                    board.content[mouse_pos[0]][mouse_pos[1]] = 0
 
-            elif (selected_piece * board.turn > 0):
-
+            elif selected_piece * board.turn > 0:
                 #To show the available moves
                 move_lst = show_moves(temp_pos, selected_piece, board)
 
                 for moves in move_lst:
                     #thank you guy on internet for alpha colours
-                    rect = ((board.space * moves[0]), (board.space * moves[1])
-                                                         , (board.space), (board.space))
+                    rect = ((board.space * moves[0]), (board.space * moves[1]), (board.space), (board.space))
                     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
                     pygame.draw.rect(shape_surf, board.pos_color, shape_surf.get_rect())
                     screen.blit(shape_surf, rect)
@@ -359,7 +367,7 @@ def game(board, screen, chess_dic):
             exact_mouse_pos = pygame.mouse.get_pos()
             mouse_pos = [math.floor(exact_mouse_pos[0] / board.space), math.floor(exact_mouse_pos[1] / board.space)]
 
-
+            #Move is legal and doesn't cause a self checkmate
             if mouse_pos in move_lst and board.turn * selected_piece > 0:
 
                 #Check for pawn promotion
@@ -369,12 +377,16 @@ def game(board, screen, chess_dic):
                     selected_piece = -5
 
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
+
                 #Check for check
                 move_lst = show_moves(mouse_pos, selected_piece, board)
-                for i in move_lst:
-                    if board.content[i[0]][i[1]] == board.turn * -6:
-                        print("check")
-                        board.check = -board.turn
+                if check(board, -board.turn):
+                    board.content[mouse_pos[0]][mouse_pos[1]] = 0
+                    board.content[temp_pos[0]][temp_pos[1]] = selected_piece
+                    board.turn *= - 1
+                elif check(board, board.turn):
+                    board.check = -board.turn
+                    print("check")
 
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
