@@ -339,6 +339,28 @@ def game(board, screen, chess_dic):
                 #To show the available moves
                 move_lst = show_moves(temp_pos, selected_piece, board)
 
+
+                new_lst = []
+                for move in move_lst:
+                    temp_piece = board.content[move[0]][move[1]]
+                    board.content[move[0]][move[1]] = selected_piece
+
+                    #Check yourself
+                    if check(board, -board.turn):
+                        board.content[move[0]][move[1]] = 0
+
+                    #Check opponent
+                    elif check(board, board.turn):
+                        board.check = -board.turn
+                        new_lst.append(move)
+
+                    else:
+                        new_lst.append(move)
+
+                    board.content[move[0]][move[1]] = temp_piece
+
+                move_lst = new_lst
+
                 for moves in move_lst:
                     #thank you guy on internet for alpha colours
                     rect = ((board.space * moves[0]), (board.space * moves[1]), (board.space), (board.space))
@@ -377,16 +399,6 @@ def game(board, screen, chess_dic):
                     selected_piece = -5
 
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
-
-                #Check for check
-                move_lst = show_moves(mouse_pos, selected_piece, board)
-                if check(board, -board.turn):
-                    board.content[mouse_pos[0]][mouse_pos[1]] = 0
-                    board.content[temp_pos[0]][temp_pos[1]] = selected_piece
-                    board.turn *= - 1
-                elif check(board, board.turn):
-                    board.check = -board.turn
-                    print("check")
 
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
