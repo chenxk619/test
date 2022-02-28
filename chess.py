@@ -2,6 +2,7 @@ import pygame
 import sys
 import numpy
 import math
+import time
 
 #General board idea :
 #
@@ -96,12 +97,27 @@ def load(board):
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
+def check_mate(board):
+    for i in range(board.const):
+        for j in range(board.const):
+            if board.content[i][j] * board.turn > 0:
+                lst = show_moves([i,j], board.content[i][j], board)
+                for k in lst:
+                    temp = board.content[k[0]][k[1]]
+                    board.content[k[0]][k[1]] = board.content[i][j]
+                    checked = check(board, -board.turn)
+                    board.content[k[0]][k[1]] = temp
+                    if not checked:
+                        return False
+
+    return True
+
 def check(board, turn):
     for i in range(board.const):
         for j in range(board.const):
             if board.content[i][j] * turn > 0:
-                enemy_lst = show_moves([i,j], board.content[i][j], board)
-                for k in enemy_lst:
+                lst = show_moves([i,j], board.content[i][j], board)
+                for k in lst:
                     if -turn * 6 == board.content[k[0]][k[1]]:
                         return True
 
@@ -300,6 +316,10 @@ def game(board, screen, chess_dic):
             if event.type == pygame.QUIT:
                 sys.exit()
 
+        if board.check == board.turn:
+            if check_mate(board):
+                start = False
+
         #Draw board : Even is white, odd is black
         #pygame.draw.rect(screen, [red, blue, green], [left, top, width, height], filled)
         for rows in range(board.const):
@@ -318,6 +338,7 @@ def game(board, screen, chess_dic):
                 chess_piece = board.content[i][j]
                 if chess_piece != 0:
                     screen.blit(chess_dic[chess_piece].sprite, (board.space * i,board.space * j))
+
 
         #m1 is clicked
         if pygame.mouse.get_pressed()[0]:
@@ -411,6 +432,13 @@ def game(board, screen, chess_dic):
 
         pygame.display.update()
 
+    #Endgame
+    if board.turn == -1:
+        print("Checkmate. White won")
+    elif board.turn == 1:
+        print("Checkmate. Black won")
+    time.sleep(5)
+
 def main():
     #Instatiate the board
     board = Board()
@@ -422,3 +450,8 @@ def main():
 
 while __name__ == '__main__':
     main()
+
+#TODO
+#1. Previous move place highlight red
+#2. castling
+#3. for each piece, create a list of where all the pieces(eg. all the pawns) are
