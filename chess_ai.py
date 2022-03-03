@@ -2,23 +2,13 @@ import pygame
 import sys
 import numpy
 import math
+import ast
 import time
 
-#General board idea :
-#
-# my_image = pygame.image.load("image.png")
-#
-# Create a new surface
-#
-# surf = pygame.Surface((X, Y))
-#
-# X and Y are horizontal and vertical dimensions in px respectively.
-#
-# Place the image on the surface
-#
-# surf.blit( my_image, (A, B), (C, D, E, F) )
+save_lst = []
 
 class Board:
+
     def __init__(self):
         self.check = 0
         self.turn = 1
@@ -30,6 +20,30 @@ class Board:
         self.pos_color = (237, 247, 49, 200)
         self.prev_color = (235, 35, 0, 200)
         self.content = numpy.zeros((self.const, self.const))
+        self.white_lst = []
+        self.black_lst = []
+        self.default_load = [-2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, -4.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 4.0, -3.0, -1.0, 0.0, 0.0, 0.0, 0.0,
+     1.0, 3.0, -5.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 5.0, -6.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 6.0, -3.0, -1.0, 0.0, 0.0,
+     0.0, 0.0, 1.0, 3.0, -4.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 4.0, -2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
+
+    #Only call the get list once
+    def get_white_lst(self):
+        self.white_lst = []
+        for i in range(self.const):
+            for j in range(self.const):
+                if self.content[i][j] > 0:
+                    self.white_lst.append([i,j])
+        return self.white_lst
+
+    def get_black_lst(self):
+        self.black_lst = []
+        for i in range(self.const):
+            for j in range(self.const):
+                if self.content[i][j] < 0:
+                    self.black_lst.append([i,j])
+        return self.black_lst
+
+
 
 #Moved to check for castling and pawn moves
 class Pieces:
@@ -58,31 +72,19 @@ def load(board):
                  -4: black_knight, 4: white_knight, -5: black_queen, 5: white_queen,
                  -6: black_king, 6: white_king}
 
-    #Load in pieces
-    for i in range(board.const):
-        board.content[i][1] = black_pawn.id
-        board.content[i][6] = white_pawn.id
+    try:
+        f = open("chess.txt", 'r')
+        if f.mode == 'r':
+            saved_lst = f.read()
+            saved_lst = ast.literal_eval(saved_lst)
+            for i in range(len(saved_lst)):
+                j = math.floor(i/8)
+                board.content[j][i % 8] = saved_lst[int(i)]
+    except:
+        for i in range(len(board.default_load)):
+            j = math.floor(i / 8)
+            board.content[j][i % 8] = board.default_load[int(i)]
 
-    for i in range(0, 8, 7):
-        if i == 0:
-            board.content[0][i] = black_rook.id
-            board.content[7][i] = black_rook.id
-            board.content[1][i] = black_knight.id
-            board.content[6][i] = black_knight.id
-            board.content[2][i] = black_bishop.id
-            board.content[5][i] = black_bishop.id
-            board.content[3][i] = black_queen.id
-            board.content[4][i] = black_king.id
-
-        else:
-            board.content[0][i] = white_rook.id
-            board.content[7][i] = white_rook.id
-            board.content[1][i] = white_knight.id
-            board.content[6][i] = white_knight.id
-            board.content[2][i] = white_bishop.id
-            board.content[5][i] = white_bishop.id
-            board.content[3][i] = white_queen.id
-            board.content[4][i] = white_king.id
 
     return chess_dic
 
@@ -99,28 +101,47 @@ def load(board):
 #question has moved
 
 def check_mate(board):
-    for i in range(board.const):
-        for j in range(board.const):
-            if board.content[i][j] * board.turn > 0:
-                lst = show_moves([i,j], board.content[i][j], board)
-                for k in lst:
-                    temp = board.content[k[0]][k[1]]
-                    board.content[k[0]][k[1]] = board.content[i][j]
+    if check(board, -board.turn):
+        if board.turn > 0:
+            for i in board.white_lst:
+                moves = show_moves(i, board.content[i[0]][i[1]], board)
+                for j in moves:
+                    temp_piece = board.content[j[0]][j[1]]
+                    board.content[j[0]][j[1]] = board.content[i[0]][i[1]]
                     checked = check(board, -board.turn)
-                    board.content[k[0]][k[1]] = temp
+                    board.content[j[0]][j[1]] = temp_piece
                     if not checked:
                         return False
 
-    return True
+        else:
+            for i in board.black_lst:
+                moves = show_moves(i, board.content[i[0]][i[1]], board)
+                for j in moves:
+                    temp_piece = board.content[j[0]][j[1]]
+                    board.content[j[0]][j[1]] = board.content[i[0]][i[1]]
+                    checked = check(board, -board.turn)
+                    board.content[j[0]][j[1]] = temp_piece
+                    if not checked:
+                        return False
+
+        return True
+
+    return False
 
 def check(board, turn):
-    for i in range(board.const):
-        for j in range(board.const):
-            if board.content[i][j] * turn > 0:
-                lst = show_moves([i,j], board.content[i][j], board)
-                for k in lst:
-                    if -turn * 6 == board.content[k[0]][k[1]]:
-                        return True
+    if turn > 0:
+        for i in board.white_lst:
+            moves = show_moves(i, board.content[i[0]][i[1]], board)
+            for j in moves:
+                if board.content[j[0]][j[1]] == -turn * 6:
+                    return True
+
+    else:
+        for i in board.black_lst:
+            moves = show_moves(i, board.content[i[0]][i[1]], board)
+            for j in moves:
+                if board.content[j[0]][j[1]] == -turn * 6:
+                    return True
 
     return False
 
@@ -233,6 +254,7 @@ def show_moves(temp_pos, selected_pieces, board):
             if board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
                 move_lst.append([temp_pos[0], temp_pos[1] - 1])
 
+            if temp_pos[1] - 2 >= 0:
                 if board.content[temp_pos[0]][temp_pos[1] - 2] == 0 and temp_pos[1] == 6:
                     move_lst.append([temp_pos[0], temp_pos[1] - 2])
 
@@ -249,6 +271,7 @@ def show_moves(temp_pos, selected_pieces, board):
             if board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
                 move_lst.append([temp_pos[0], temp_pos[1] + 1])
 
+            if temp_pos[1] + 2 <= 7:
                 if board.content[temp_pos[0]][temp_pos[1] + 2] == 0 and temp_pos[1] == 1:
                     move_lst.append([temp_pos[0], temp_pos[1] + 2])
 
@@ -303,6 +326,7 @@ def show_moves(temp_pos, selected_pieces, board):
 def game(board, screen, chess_dic):
 
     start = True
+    restart = False
 
     #check if mouse is pressed
     pressed = False
@@ -311,6 +335,8 @@ def game(board, screen, chess_dic):
     temp_pos = None
     prev_rect = None
     move_lst = []
+    board.get_white_lst()
+    board.get_black_lst()
 
     while start:
 
@@ -318,9 +344,8 @@ def game(board, screen, chess_dic):
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        if board.check == board.turn:
-            if check_mate(board):
-                start = False
+        if check_mate(board):
+            start = False
 
         #Draw board : Even is white, odd is black
         #pygame.draw.rect(screen, [red, blue, green], [left, top, width, height], filled)
@@ -372,11 +397,6 @@ def game(board, screen, chess_dic):
                     if check(board, -board.turn):
                         board.content[move[0]][move[1]] = 0
 
-                    #Check opponent
-                    elif check(board, board.turn):
-                        board.check = -board.turn
-                        new_lst.append(move)
-
                     else:
                         new_lst.append(move)
 
@@ -405,8 +425,6 @@ def game(board, screen, chess_dic):
                 move_lst = []
 
 
-
-
         #m1 is released
         if not pygame.mouse.get_pressed()[0] and pressed == True:
             pressed = False
@@ -424,17 +442,19 @@ def game(board, screen, chess_dic):
                     selected_piece = -5
 
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
+
+                board.get_black_lst()
+                board.get_white_lst()
+                # Check for check
+                if check(board, board.turn):
+                    board.check = -board.turn
+
                 #Show the previous move
-                print(temp_pos)
                 prev_rect = ((board.space * temp_pos[0]), (board.space * temp_pos[1]), (board.space), (board.space))
-                # shape_surf = pygame.Surface(pygame.Rect(prev_rect).size, pygame.SRCALPHA)
-                # pygame.draw.rect(shape_surf, board.pos_color, shape_surf.get_rect())
-                # screen.blit(shape_surf, prev_rect)
 
             else:
                 board.content[temp_pos[0]][temp_pos[1]] = selected_piece
                 board.turn *= - 1
-
 
             #has to be here to use the piece's id
             selected_piece = None
@@ -448,12 +468,39 @@ def game(board, screen, chess_dic):
 
         pygame.display.update()
 
+        #Restart board
+        if pygame.key.get_pressed()[pygame.K_r] and pygame.key.get_pressed()[pygame.K_LSHIFT]:
+            with open('chess.txt', 'w') as f:
+                restart = True
+                f.write(str(board.default_load))
+                start = False
+
+        #Save board
+        if len(save_lst) == 0:
+            if check_mate(board) or pygame.key.get_pressed()[pygame.K_s]:
+                print("board saved")
+                for i in board.content:
+                    for j in i:
+                        save_lst.append(j)
+                        with open('chess.txt', 'w') as f:
+                            f.write(str(save_lst))
+
+
+
+
     #Endgame
-    if board.turn == -1:
-        print("Checkmate. White won")
+    if restart:
+        print("board restarted")
+    elif board.turn == -1:
+        print("Checkmate. White won.")
     elif board.turn == 1:
-        print("Checkmate. Black won")
-    time.sleep(5)
+        print("Checkmate. Black won.")
+
+    print("Space to restart")
+    while True:
+        event = pygame.event.wait()
+        if pygame.key.get_pressed()[pygame.K_SPACE]:
+            break
 
 def main():
     #Instatiate the board
@@ -470,4 +517,4 @@ while __name__ == '__main__':
 #TODO
 
 #2. castling - u cant castle if either rook or king has moved, or if the rook is captured
-#3. for each piece, create a list of where all the pieces(eg. all the pawns) are
+#3. for restart, take note of turn order

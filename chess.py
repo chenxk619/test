@@ -425,7 +425,6 @@ def game(board, screen, chess_dic):
 
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
                 #Show the previous move
-                print(temp_pos)
                 prev_rect = ((board.space * temp_pos[0]), (board.space * temp_pos[1]), (board.space), (board.space))
                 # shape_surf = pygame.Surface(pygame.Rect(prev_rect).size, pygame.SRCALPHA)
                 # pygame.draw.rect(shape_surf, board.pos_color, shape_surf.get_rect())
@@ -450,10 +449,13 @@ def game(board, screen, chess_dic):
 
     #Endgame
     if board.turn == -1:
-        print("Checkmate. White won")
+        print("Checkmate. White won. Press space to continue")
     elif board.turn == 1:
-        print("Checkmate. Black won")
-    time.sleep(5)
+        print("Checkmate. Black won. Press space to continue")
+    while True:
+        event = pygame.event.wait()
+        if pygame.key.get_pressed()[pygame.K_SPACE]:
+            break
 
 def main():
     #Instatiate the board
