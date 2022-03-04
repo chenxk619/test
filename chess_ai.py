@@ -106,10 +106,17 @@ def check_mate(board):
             for i in board.white_lst:
                 moves = show_moves(i, board.content[i[0]][i[1]], board)
                 for j in moves:
-                    temp_piece = board.content[j[0]][j[1]]
-                    board.content[j[0]][j[1]] = board.content[i[0]][i[1]]
+                    print("white", board.content[i[0]][i[1]], j)
+                    #New pos piece, king = king , 0
+                    new_piece = board.content[j[0]][j[1]]
+                    old_piece = board.content[i[0]][i[1]]
+                    # New pos piece, king = king , 0
+                    board.content[j[0]][j[1]] , board.content[i[0]][i[1]] = board.content[i[0]][i[1]] , 0
+                    #update list
+                    board.get_white_lst()
                     checked = check(board, -board.turn)
-                    board.content[j[0]][j[1]] = temp_piece
+                    board.content[i[0]][i[1]], board.content[j[0]][j[1]] = old_piece , new_piece
+                    board.get_white_lst()
                     if not checked:
                         return False
 
@@ -117,10 +124,17 @@ def check_mate(board):
             for i in board.black_lst:
                 moves = show_moves(i, board.content[i[0]][i[1]], board)
                 for j in moves:
-                    temp_piece = board.content[j[0]][j[1]]
-                    board.content[j[0]][j[1]] = board.content[i[0]][i[1]]
+                    print("black", board.content[i[0]][i[1]], j)
+                    # New pos piece, king = king , 0
+                    new_piece = board.content[j[0]][j[1]]
+                    old_piece = board.content[i[0]][i[1]]
+                    # New pos piece, king = king , 0
+                    board.content[j[0]][j[1]], board.content[i[0]][i[1]] = board.content[i[0]][i[1]], 0
+                    # update list
+                    board.get_black_lst()
                     checked = check(board, -board.turn)
-                    board.content[j[0]][j[1]] = temp_piece
+                    board.content[i[0]][i[1]], board.content[j[0]][j[1]] = old_piece, new_piece
+                    board.get_black_lst()
                     if not checked:
                         return False
 
