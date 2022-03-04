@@ -76,6 +76,8 @@ def load(board):
         f = open("chess.txt", 'r')
         if f.mode == 'r':
             saved_lst = f.read()
+            board.turn = int(saved_lst[-1]) - 2
+            saved_lst = saved_lst[0:-1]
             saved_lst = ast.literal_eval(saved_lst)
             for i in range(len(saved_lst)):
                 j = math.floor(i/8)
@@ -106,8 +108,7 @@ def check_mate(board):
             for i in board.white_lst:
                 moves = show_moves(i, board.content[i[0]][i[1]], board)
                 for j in moves:
-                    print("white", board.content[i[0]][i[1]], j)
-                    #New pos piece, king = king , 0
+                    #og pieces
                     new_piece = board.content[j[0]][j[1]]
                     old_piece = board.content[i[0]][i[1]]
                     # New pos piece, king = king , 0
@@ -124,8 +125,7 @@ def check_mate(board):
             for i in board.black_lst:
                 moves = show_moves(i, board.content[i[0]][i[1]], board)
                 for j in moves:
-                    print("black", board.content[i[0]][i[1]], j)
-                    # New pos piece, king = king , 0
+                    #og pieces
                     new_piece = board.content[j[0]][j[1]]
                     old_piece = board.content[i[0]][i[1]]
                     # New pos piece, king = king , 0
@@ -487,6 +487,7 @@ def game(board, screen, chess_dic):
             with open('chess.txt', 'w') as f:
                 restart = True
                 f.write(str(board.default_load))
+                f.write("3")
                 start = False
 
         #Save board
@@ -498,8 +499,7 @@ def game(board, screen, chess_dic):
                         save_lst.append(j)
                         with open('chess.txt', 'w') as f:
                             f.write(str(save_lst))
-
-
+                            f.write(str(board.turn + 2))
 
 
     #Endgame
