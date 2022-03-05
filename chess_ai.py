@@ -25,6 +25,7 @@ class Board:
         self.default_load = [-2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, -4.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 4.0, -3.0, -1.0, 0.0, 0.0, 0.0, 0.0,
      1.0, 3.0, -5.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 5.0, -6.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 6.0, -3.0, -1.0, 0.0, 0.0,
      0.0, 0.0, 1.0, 3.0, -4.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 4.0, -2.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
+        self.castle_lst = [True, True, True, True]
 
     #Only call the get list once
     def get_white_lst(self):
@@ -47,11 +48,12 @@ class Board:
 
 #Moved to check for castling and pawn moves
 class Pieces:
-    def __init__(self, sprite, id, value):
+    def __init__(self, sprite = "black_pawn", id = 0, value = 0):
         self.sprite = pygame.transform.scale(pygame.image.load("chess_folder/" + sprite + ".png") , (94,94))
         self.id = id
         self.value = value
-        self.moved = False
+        self.bking_moved = False
+        self.wking_moved = False
 
 def load(board):
 
@@ -90,23 +92,14 @@ def load(board):
 
     return chess_dic
 
-# Pawn chess pieces can only directly forward one square, with two exceptions.
-# Pawns can move directly forward two squares on their first move only.
-# Pawns can move diagonally forward when capturing an opponent's chess piece.
-# Once a pawn chess piece reaches the other side of the chess board, the player may "trade" the pawn in for any other chess
-# piece if they choose, except another king.
-
-
-#Rest is ez
-
 #Castling is when the king moves two spaces to the left or right, assuming it is not under check and neither the king nor the rook in
 #question has moved
 
-def check_mate(board):
-    if check(board, -board.turn):
+def check_mate(board, pieces):
+    if check(board, -board.turn, pieces):
         if board.turn > 0:
             for i in board.white_lst:
-                moves = show_moves(i, board.content[i[0]][i[1]], board)
+                moves = show_moves(i, board.content[i[0]][i[1]], board, pieces)
                 for j in moves:
                     #og pieces
                     new_piece = board.content[j[0]][j[1]]
@@ -115,7 +108,7 @@ def check_mate(board):
                     board.content[j[0]][j[1]] , board.content[i[0]][i[1]] = board.content[i[0]][i[1]] , 0
                     #update list
                     board.get_white_lst()
-                    checked = check(board, -board.turn)
+                    checked = check(board, -board.turn, pieces)
                     board.content[i[0]][i[1]], board.content[j[0]][j[1]] = old_piece , new_piece
                     board.get_white_lst()
                     if not checked:
@@ -123,7 +116,7 @@ def check_mate(board):
 
         else:
             for i in board.black_lst:
-                moves = show_moves(i, board.content[i[0]][i[1]], board)
+                moves = show_moves(i, board.content[i[0]][i[1]], board, pieces)
                 for j in moves:
                     #og pieces
                     new_piece = board.content[j[0]][j[1]]
@@ -132,7 +125,7 @@ def check_mate(board):
                     board.content[j[0]][j[1]], board.content[i[0]][i[1]] = board.content[i[0]][i[1]], 0
                     # update list
                     board.get_black_lst()
-                    checked = check(board, -board.turn)
+                    checked = check(board, -board.turn, pieces)
                     board.content[i[0]][i[1]], board.content[j[0]][j[1]] = old_piece, new_piece
                     board.get_black_lst()
                     if not checked:
@@ -142,17 +135,17 @@ def check_mate(board):
 
     return False
 
-def check(board, turn):
+def check(board, turn, pieces):
     if turn > 0:
         for i in board.white_lst:
-            moves = show_moves(i, board.content[i[0]][i[1]], board)
+            moves = show_moves(i, board.content[i[0]][i[1]], board, pieces)
             for j in moves:
                 if board.content[j[0]][j[1]] == -turn * 6:
                     return True
 
     else:
         for i in board.black_lst:
-            moves = show_moves(i, board.content[i[0]][i[1]], board)
+            moves = show_moves(i, board.content[i[0]][i[1]], board, pieces)
             for j in moves:
                 if board.content[j[0]][j[1]] == -turn * 6:
                     return True
@@ -259,7 +252,7 @@ def show_moves_check(straights, diagonals, single_move, temp_pos, selected_piece
 
     return move_lst
 
-def show_moves(temp_pos, selected_pieces, board):
+def show_moves(temp_pos, selected_pieces, board, pieces):
     move_lst = []
     #Pawn
     if abs(selected_pieces) == 1:
@@ -333,11 +326,24 @@ def show_moves(temp_pos, selected_pieces, board):
     #King
     if abs(selected_pieces) == 6:
         move_lst = show_moves_check(True, True, True, temp_pos, selected_pieces, board)
+        #option to castle
+        if selected_pieces == 6 and not pieces.wking_moved:
+            if board.castle_lst[0] and board.content[1][7] == board.content[2][7] == board.content[3][7] == 0:
+                move_lst.append([2,7])
+            if board.castle_lst[1] and board.content[5][7] == board.content[6][7]:
+                print('here2')
+                move_lst.append([6,7])
+
+        if selected_pieces == -6 and not pieces.bking_moved:
+            if board.castle_lst[2] and board.content[1][0] == board.content[2][0] == board.content[3][0] == 0:
+                move_lst.append([2,0])
+            if board.castle_lst[3] and board.content[5][0] == board.content[6][0]:
+                move_lst.append([6,0])
 
     return move_lst
 
 
-def game(board, screen, chess_dic):
+def game(board, screen, chess_dic, pieces):
 
     start = True
     restart = False
@@ -358,7 +364,7 @@ def game(board, screen, chess_dic):
             if event.type == pygame.QUIT:
                 sys.exit()
 
-        if check_mate(board):
+        if check_mate(board, pieces):
             start = False
 
         #Draw board : Even is white, odd is black
@@ -399,7 +405,7 @@ def game(board, screen, chess_dic):
 
             elif selected_piece * board.turn > 0:
                 #To show the available moves
-                move_lst = show_moves(temp_pos, selected_piece, board)
+                move_lst = show_moves(temp_pos, selected_piece, board, pieces)
 
 
                 new_lst = []
@@ -408,7 +414,7 @@ def game(board, screen, chess_dic):
                     board.content[move[0]][move[1]] = selected_piece
 
                     #Check yourself
-                    if check(board, -board.turn):
+                    if check(board, -board.turn, pieces):
                         board.content[move[0]][move[1]] = 0
 
                     else:
@@ -455,12 +461,47 @@ def game(board, screen, chess_dic):
                 if selected_piece == -1 and mouse_pos[1] == board.const - 1:
                     selected_piece = -5
 
+                #Check for castle, and disable castling (king)
+                if selected_piece == 6:
+                    if mouse_pos == [2,7]:
+                        board.content[3][7] = 2
+                        board.content[0][7] = 0
+                        board.castle_lst[0] = False
+                    if mouse_pos == [6,7]:
+                        board.content[5][7] = 2
+                        board.content[7][7] = 0
+                        board.castle_lst[1] = False
+                    pieces.wking_moved = True
+
+                if selected_piece == -6:
+                    if mouse_pos == [2,0]:
+                        board.content[3][0] = 2
+                        board.content[0][0] = 0
+                        board.castle_lst[2] = False
+                    if mouse_pos == [6,0]:
+                        board.content[5][0] = 2
+                        board.content[7][0] = 0
+                        board.castle_lst[3] = False
+                    pieces.bking_moved = True
+
+                #disable castling (rook)
+                if abs(selected_piece) == 2:
+                    if temp_pos == [0,7]:
+                        board.castle_lst[0] = False
+                    if temp_pos == [7,7]:
+                        board.castle_lst[1] = False
+                    if temp_pos == [0,0]:
+                        board.castle_lst[2] = False
+                    if temp_pos == [6,0]:
+                        board.castle_lst[3] = False
+
+                #Make the move
                 board.content[mouse_pos[0]][mouse_pos[1]] = selected_piece
 
                 board.get_black_lst()
                 board.get_white_lst()
                 # Check for check
-                if check(board, board.turn):
+                if check(board, board.turn, pieces):
                     board.check = -board.turn
 
                 #Show the previous move
@@ -486,19 +527,19 @@ def game(board, screen, chess_dic):
         if pygame.key.get_pressed()[pygame.K_r] and pygame.key.get_pressed()[pygame.K_LSHIFT]:
             with open('chess.txt', 'w') as f:
                 restart = True
-                f.write(str(board.default_load))
+                f.write(str(board.default_load)+ '\n')
                 f.write("3")
                 start = False
 
         #Save board
         if len(save_lst) == 0:
-            if check_mate(board) or pygame.key.get_pressed()[pygame.K_s]:
+            if check_mate(board, pieces) or pygame.key.get_pressed()[pygame.K_s]:
                 print("board saved")
                 for i in board.content:
                     for j in i:
                         save_lst.append(j)
                         with open('chess.txt', 'w') as f:
-                            f.write(str(save_lst))
+                            f.write(str(save_lst)+ '\n')
                             f.write(str(board.turn + 2))
 
 
@@ -523,7 +564,8 @@ def main():
     pygame.display.set_caption('Chess')
     screen = pygame.display.set_mode((board.length, board.length))
     chess_dic = load(board)
-    game(board, screen, chess_dic)
+    pieces = Pieces()
+    game(board, screen, chess_dic, pieces)
 
 while __name__ == '__main__':
     main()
