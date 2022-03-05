@@ -475,11 +475,11 @@ def game(board, screen, chess_dic, pieces):
 
                 if selected_piece == -6:
                     if mouse_pos == [2,0]:
-                        board.content[3][0] = 2
+                        board.content[3][0] = -2
                         board.content[0][0] = 0
                         board.castle_lst[2] = False
                     if mouse_pos == [6,0]:
-                        board.content[5][0] = 2
+                        board.content[5][0] = -2
                         board.content[7][0] = 0
                         board.castle_lst[3] = False
                     pieces.bking_moved = True
