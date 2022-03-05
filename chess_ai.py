@@ -260,8 +260,7 @@ def show_moves(temp_pos, selected_pieces, board, pieces):
 
             if board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
                 move_lst.append([temp_pos[0], temp_pos[1] - 1])
-
-            if temp_pos[1] - 2 >= 0:
+            if temp_pos[1] - 2 >= 0 and board.content[temp_pos[0]][temp_pos[1] - 1] == 0:
                 if board.content[temp_pos[0]][temp_pos[1] - 2] == 0 and temp_pos[1] == 6:
                     move_lst.append([temp_pos[0], temp_pos[1] - 2])
 
@@ -275,10 +274,10 @@ def show_moves(temp_pos, selected_pieces, board, pieces):
 
 
         if selected_pieces == -1:
+
             if board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
                 move_lst.append([temp_pos[0], temp_pos[1] + 1])
-
-            if temp_pos[1] + 2 <= 7:
+            if temp_pos[1] + 2 <= 7 and board.content[temp_pos[0]][temp_pos[1] + 1] == 0:
                 if board.content[temp_pos[0]][temp_pos[1] + 2] == 0 and temp_pos[1] == 1:
                     move_lst.append([temp_pos[0], temp_pos[1] + 2])
 
@@ -463,7 +462,7 @@ def game(board, screen, chess_dic, pieces):
 
                 #Check for castle, and disable castling (king)
                 if selected_piece == 6:
-                    if mouse_pos == [2,7]:
+                    if mouse_pos == [2,7] and not pieces.wking_moved:
                         board.content[3][7] = 2
                         board.content[0][7] = 0
                         board.castle_lst[0] = False
@@ -474,7 +473,7 @@ def game(board, screen, chess_dic, pieces):
                     pieces.wking_moved = True
 
                 if selected_piece == -6:
-                    if mouse_pos == [2,0]:
+                    if mouse_pos == [2,0] and not pieces.bking_moved:
                         board.content[3][0] = -2
                         board.content[0][0] = 0
                         board.castle_lst[2] = False
