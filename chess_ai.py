@@ -78,12 +78,20 @@ def load(board):
         f = open("chess.txt", 'r')
         if f.mode == 'r':
             saved_lst = f.read()
-            board.turn = int(saved_lst[-1]) - 2
-            saved_lst = saved_lst[0:-1]
             saved_lst = ast.literal_eval(saved_lst)
             for i in range(len(saved_lst)):
-                j = math.floor(i/8)
-                board.content[j][i % 8] = saved_lst[int(i)]
+                if i < len(board.default_load):
+                    j = math.floor(i/8)
+                    board.content[j][i % 8] = saved_lst[int(i)]
+                elif i == len(board.default_load) :
+                    board.turn = int(saved_lst[i]) - 2
+                elif i == len(board.default_load) + 1:
+                    board.castle_lst = ast.literal_eval(saved_lst[i])
+                elif i == len(board.default_load) + 2:
+                    Pieces.wking_moved = saved_lst[i]
+                elif i == len(board.default_load) + 3:
+                    Pieces.bking_moved = saved_lst[i]
+
     except:
         for i in range(len(board.default_load)):
             j = math.floor(i / 8)
@@ -491,7 +499,7 @@ def game(board, screen, chess_dic, pieces):
                         board.castle_lst[1] = False
                     if temp_pos == [0,0]:
                         board.castle_lst[2] = False
-                    if temp_pos == [6,0]:
+                    if temp_pos == [7,0]:
                         board.castle_lst[3] = False
 
                 #Make the move
@@ -524,11 +532,14 @@ def game(board, screen, chess_dic, pieces):
 
         #Restart board
         if pygame.key.get_pressed()[pygame.K_r] and pygame.key.get_pressed()[pygame.K_LSHIFT]:
+            restart = True
+            start = False
+            board.default_load.append("3")
+            board.default_load.append(str(board.castle_lst))
+            board.default_load.append(str(pieces.wking_moved))
+            board.default_load.append(str(pieces.bking_moved))
             with open('chess.txt', 'w') as f:
-                restart = True
-                f.write(str(board.default_load)+ '\n')
-                f.write("3")
-                start = False
+                f.write(str(board.default_load))
 
         #Save board
         if len(save_lst) == 0:
@@ -537,9 +548,12 @@ def game(board, screen, chess_dic, pieces):
                 for i in board.content:
                     for j in i:
                         save_lst.append(j)
-                        with open('chess.txt', 'w') as f:
-                            f.write(str(save_lst)+ '\n')
-                            f.write(str(board.turn + 2))
+                save_lst.append(str(board.turn + 2))
+                save_lst.append(str(board.castle_lst))
+                save_lst.append(str(pieces.wking_moved))
+                save_lst.append(str(pieces.bking_moved))
+                with open('chess.txt', 'w') as f:
+                    f.write(str(save_lst))
 
 
     #Endgame
@@ -568,8 +582,3 @@ def main():
 
 while __name__ == '__main__':
     main()
-
-#TODO
-
-#2. castling - u cant castle if either rook or king has moved, or if the rook is captured
-#3. for restart, take note of turn order
