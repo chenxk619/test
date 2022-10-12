@@ -338,7 +338,6 @@ def show_moves(temp_pos, selected_pieces, board, pieces):
             if board.castle_lst[0] and board.content[1][7] == board.content[2][7] == board.content[3][7] == 0:
                 move_lst.append([2,7])
             if board.castle_lst[1] and board.content[5][7] == board.content[6][7]:
-                print('here2')
                 move_lst.append([6,7])
 
         if selected_pieces == -6 and not pieces.bking_moved:
